@@ -8,6 +8,7 @@ import {
 export default [
   layout("./layouts/app-layout.tsx", [
     index("routes/home.tsx"),
-    route("plant", "routes/plant.tsx"),
+    route("create", "routes/create-material.tsx"),
+    route("search", "routes/search.tsx"),
   ]),
 ] satisfies RouteConfig;
