@@ -28,6 +28,7 @@ NOTE: The current postgres scripts do not save a volume locally. This means that
 ## System Architecture
 
 ```mermaid
-A(PostgREST) --> B(Express Server)
-B --> C(React App)
+flowchart TD
+    A(PostgREST) --> B(Express Server)
+    B --> C(React App)
 ```
