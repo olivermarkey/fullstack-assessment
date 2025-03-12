@@ -1,36 +1,36 @@
 import { type Request, type Response } from 'express';
 import { BaseController } from './base-controller';
-import { MaterialModel } from '../model/material-model';
+import { NounModel } from '../model/noun-model';
 import { z } from 'zod';
-import { createMaterialSchema, updateMaterialSchema } from '../model/schemas';
+import { createNounSchema, updateNounSchema } from '../model/schemas';
 
 /**
- * Controller handling all material-related HTTP requests.
- * Provides CRUD operations for materials with input validation.
+ * Controller handling all noun-related HTTP requests.
+ * Provides CRUD operations for nouns with input validation.
  */
-export class MaterialController extends BaseController {
-  private materialModel: MaterialModel;
+export class NounController extends BaseController {
+  private nounModel: NounModel;
 
   /**
-   * Initializes a new instance of MaterialController.
-   * Sets up the material model for database operations.
+   * Initializes a new instance of NounController.
+   * Sets up the noun model for database operations.
    */
   constructor() {
     super();
-    this.materialModel = new MaterialModel();
+    this.nounModel = new NounModel();
   }
 
   /**
-   * Retrieves all materials from the database.
+   * Retrieves all nouns from the database.
    * @param {Request} req - Express request object
    * @param {Response} res - Express response object
-   * @returns {Promise<Response>} JSON array of all materials
+   * @returns {Promise<Response>} JSON array of all nouns
    * @throws {Error} When database operation fails
    */
   public async getAll(req: Request, res: Response) {
     try {
-      const materials = await this.materialModel.findAll();
-      return res.json(materials);
+      const nouns = await this.nounModel.findAll();
+      return res.json(nouns);
     } catch (error) {
       const errorResponse = this.handleError(error as Error);
       return res.status(500).json(errorResponse);
@@ -38,22 +38,39 @@ export class MaterialController extends BaseController {
   }
 
   /**
-   * Retrieves a single material by its ID.
-   * @param {Request} req - Express request object with material ID in params
+   * Retrieves all active nouns from the database.
+   * @param {Request} req - Express request object
    * @param {Response} res - Express response object
-   * @returns {Promise<Response>} JSON object of the found material or 404 if not found
+   * @returns {Promise<Response>} JSON array of active nouns
+   * @throws {Error} When database operation fails
+   */
+  public async getActive(req: Request, res: Response) {
+    try {
+      const nouns = await this.nounModel.findActive();
+      return res.json(nouns);
+    } catch (error) {
+      const errorResponse = this.handleError(error as Error);
+      return res.status(500).json(errorResponse);
+    }
+  }
+
+  /**
+   * Retrieves a single noun by its ID.
+   * @param {Request} req - Express request object with noun ID in params
+   * @param {Response} res - Express response object
+   * @returns {Promise<Response>} JSON object of the found noun or 404 if not found
    * @throws {Error} When database operation fails or ID format is invalid
    */
   public async getById(req: Request, res: Response) {
     try {
       const id = z.string().parse(req.params.id);
-      const material = await this.materialModel.findById(id);
+      const noun = await this.nounModel.findById(id);
       
-      if (!material) {
-        return res.status(404).json({ message: 'Material not found' });
+      if (!noun) {
+        return res.status(404).json({ message: 'Noun not found' });
       }
       
-      return res.json(material);
+      return res.json(noun);
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: 'Invalid ID format' });
@@ -64,21 +81,21 @@ export class MaterialController extends BaseController {
   }
 
   /**
-   * Creates a new material.
-   * @param {Request} req - Express request object with material data in body
+   * Creates a new noun.
+   * @param {Request} req - Express request object with noun data in body
    * @param {Response} res - Express response object
-   * @returns {Promise<Response>} JSON object of the created material
+   * @returns {Promise<Response>} JSON object of the created noun
    * @throws {Error} When validation fails or database operation fails
    */
   public async create(req: Request, res: Response) {
     try {
-      const materialData = createMaterialSchema.parse(req.body);
-      const newMaterial = await this.materialModel.create(materialData);
-      return res.status(201).json(newMaterial);
+      const nounData = createNounSchema.parse(req.body);
+      const newNoun = await this.nounModel.create(nounData);
+      return res.status(201).json(newNoun);
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ 
-          message: 'Invalid material data',
+          message: 'Invalid noun data',
           errors: error.errors
         });
       }
@@ -88,27 +105,27 @@ export class MaterialController extends BaseController {
   }
 
   /**
-   * Updates an existing material by its ID.
-   * @param {Request} req - Express request object with material ID in params and update data in body
+   * Updates an existing noun by its ID.
+   * @param {Request} req - Express request object with noun ID in params and update data in body
    * @param {Response} res - Express response object
-   * @returns {Promise<Response>} JSON object of the updated material or 404 if not found
+   * @returns {Promise<Response>} JSON object of the updated noun or 404 if not found
    * @throws {Error} When validation fails or database operation fails
    */
   public async update(req: Request, res: Response) {
     try {
       const id = z.string().parse(req.params.id);
-      const materialData = updateMaterialSchema.parse(req.body);
-      const updatedMaterial = await this.materialModel.update(id, materialData);
+      const nounData = updateNounSchema.parse(req.body);
+      const updatedNoun = await this.nounModel.update(id, nounData);
       
-      if (!updatedMaterial) {
-        return res.status(404).json({ message: 'Material not found' });
+      if (!updatedNoun) {
+        return res.status(404).json({ message: 'Noun not found' });
       }
       
-      return res.json(updatedMaterial);
+      return res.json(updatedNoun);
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ 
-          message: 'Invalid material data',
+          message: 'Invalid noun data',
           errors: error.errors
         });
       }
@@ -118,8 +135,9 @@ export class MaterialController extends BaseController {
   }
 
   /**
-   * Deletes a material by its ID.
-   * @param {Request} req - Express request object with material ID in params
+   * Deletes a noun by its ID.
+   * Note: This will cascade delete related classes and materials.
+   * @param {Request} req - Express request object with noun ID in params
    * @param {Response} res - Express response object
    * @returns {Promise<Response>} 204 No Content on success or 404 if not found
    * @throws {Error} When database operation fails or ID format is invalid
@@ -127,10 +145,10 @@ export class MaterialController extends BaseController {
   public async delete(req: Request, res: Response) {
     try {
       const id = z.string().parse(req.params.id);
-      const deleted = await this.materialModel.delete(id);
+      const deleted = await this.nounModel.delete(id);
       
       if (!deleted) {
-        return res.status(404).json({ message: 'Material not found' });
+        return res.status(404).json({ message: 'Noun not found' });
       }
       
       return res.status(204).send();
@@ -142,4 +160,4 @@ export class MaterialController extends BaseController {
       return res.status(500).json(errorResponse);
     }
   }
-}
+} 

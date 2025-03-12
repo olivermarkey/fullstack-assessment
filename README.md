@@ -27,8 +27,17 @@ NOTE: The current postgres scripts do not save a volume locally. This means that
 
 ## System Architecture
 
+This fullstack application is designed to follow a MVC architecture, where the views are handled by React Router, and the express server is used to handle the business and data logic (Models and Controllers). This structure allows for a separation of concerns and a more modular design.
+
+At this point the functions of the controllers and models are somewhat abitrary, but they are easily extendable and can be used to handle more complex business logic.
+
 ```mermaid
 flowchart TD
-    A(PostgREST) --> B(Express Server)
-    B --> C(React App)
+    A[(Postgres Docker Image)] --> B(PostgREST)
+    B --> C(Express Server)
+    C --> D(Data Models)
+    D --> E(Controllers)
+    E --> C
+    C --> F(Express Router)
+    F --> G(React Router App)
 ```

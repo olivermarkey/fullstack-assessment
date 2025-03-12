@@ -1,45 +1,87 @@
-interface IMaterial {
-  id?: number;
-  name: string;
-  // Add other properties as needed
-}
+import { postgrestClient } from '../utils/postgrest-client';
+import {
+  materialSchema,
+  createMaterialSchema,
+  updateMaterialSchema,
+  type Material,
+  type CreateMaterial,
+  type UpdateMaterial,
+} from './schemas';
 
+/**
+ * Model class for handling Material database operations.
+ * Provides CRUD operations with data validation using Zod schemas.
+ * Communicates with the PostgreSQL database through PostgREST.
+ */
 export class MaterialModel {
-  private materials: IMaterial[] = []; // This will be replaced with actual DB connection
+  private readonly tableName = 'material';
 
-  async findAll(): Promise<IMaterial[]> {
-    // In a real app, this would be a DB query
-    return this.materials;
+  /**
+   * Retrieves all materials from the database.
+   * @returns {Promise<Material[]>} Array of materials with validated schema
+   * @throws {Error} When database operation fails or response validation fails
+   */
+  async findAll(): Promise<Material[]> {
+    const response = await postgrestClient.get<unknown[]>(this.tableName);
+    return response.map(item => materialSchema.parse(item));
   }
 
-  async findById(id: number): Promise<IMaterial | null> {
-    const material = this.materials.find(m => m.id === id);
-    return material || null;
+  /**
+   * Retrieves a single material by its ID.
+   * @param {string} id - The unique identifier of the material
+   * @returns {Promise<Material | null>} Material object if found, null otherwise
+   * @throws {Error} When database operation fails or response validation fails
+   */
+  async findById(id: string): Promise<Material | null> {
+    const response = await postgrestClient.get<unknown[]>(`${this.tableName}?id=eq.${id}`);
+    if (!response.length) return null;
+    return materialSchema.parse(response[0]);
   }
 
-  async create(material: IMaterial): Promise<IMaterial> {
-    const newId = this.materials.length + 1;
-    const newMaterial = { ...material, id: newId };
-    this.materials.push(newMaterial);
-    return newMaterial;
+  /**
+   * Creates a new material in the database.
+   * @param {CreateMaterial} data - The material data to create
+   * @returns {Promise<Material>} The created material with generated ID
+   * @throws {Error} When validation fails or database operation fails
+   */
+  async create(data: CreateMaterial): Promise<Material> {
+    const validatedData = createMaterialSchema.parse(data);
+    const response = await postgrestClient.post<unknown>(this.tableName, validatedData);
+    return materialSchema.parse(response);
   }
 
-  async update(id: number, material: Partial<IMaterial>): Promise<IMaterial | null> {
-    const index = this.materials.findIndex(m => m.id === id);
-    if (index === -1) return null;
-    
-    this.materials[index] = { ...this.materials[index], ...material };
-    return this.materials[index];
+  /**
+   * Updates an existing material by its ID.
+   * @param {string} id - The unique identifier of the material to update
+   * @param {UpdateMaterial} data - The partial material data to update
+   * @returns {Promise<Material | null>} Updated material if found, null otherwise
+   * @throws {Error} When validation fails or database operation fails
+   */
+  async update(id: string, data: UpdateMaterial): Promise<Material | null> {
+    const validatedData = updateMaterialSchema.parse(data);
+    const response = await postgrestClient.patch<unknown[]>(
+      `${this.tableName}?id=eq.${id}`,
+      validatedData
+    );
+    if (!response.length) return null;
+    return materialSchema.parse(response[0]);
   }
 
-  async delete(id: number): Promise<boolean> {
-    const index = this.materials.findIndex(m => m.id === id);
-    if (index === -1) return false;
-    
-    this.materials.splice(index, 1);
-    return true;
+  /**
+   * Deletes a material by its ID.
+   * @param {string} id - The unique identifier of the material to delete
+   * @returns {Promise<boolean>} True if material was deleted, false if not found
+   * @throws {Error} When database operation fails
+   */
+  async delete(id: string): Promise<boolean> {
+    try {
+      await postgrestClient.delete(`${this.tableName}?id=eq.${id}`);
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 }
 
-// Export the interface for use in other files
-export type { IMaterial };
+// Export the types
+export type { Material, CreateMaterial, UpdateMaterial };
