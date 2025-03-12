@@ -1,0 +1,36 @@
+# This file was retrieved from https://postgrest.org/en/stable/explanations/install.html#containerized-postgrest-and-db-with-docker-compose
+# Runs a docker compose file for a postgres database and a postgrest server
+services:
+  # Postgrest server
+  server:
+    container_name: postgrest-container
+    image: postgrest/postgrest
+    ports:
+      - "3000:3000"
+    environment:
+      PGRST_DB_URI: postgres://db_user:password@db:5432/postgresdb
+      PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3000
+      PGRST_DB_ANON_ROLE: db_user
+      PGRST_DB_SCHEMA: public
+      PGRST_JWT_SECRET: "your-super-secret-jwt-token"
+    depends_on:
+      - db
+
+  # Postgres database
+  db:
+    container_name: db-container
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: postgresdb
+      POSTGRES_USER: db_user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+# Add this volumes section at the root level
+volumes:
+  postgres_data:
+

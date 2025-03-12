@@ -2,7 +2,7 @@ import { Outlet } from "react-router";
 import { AppShell, Burger, Group } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import NavLinkComponent from "~/components/common/nav-link-component";
-import { IconHome, IconPlus, IconSearch } from "@tabler/icons-react";
+import { IconHome, IconPlus, IconSearch, IconSettings } from "@tabler/icons-react";
 
 const navLinks = [
   {
@@ -19,6 +19,11 @@ const navLinks = [
     to: "/create",
     label: "Create",
     icon: IconPlus,
+  },
+  {
+    to: "/configuration",
+    label: "Configuration",
+    icon: IconSettings,
   },
 ];
 

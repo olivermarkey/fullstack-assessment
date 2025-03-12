@@ -6,7 +6,11 @@
     "build": "react-router build",
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc"
+    "typecheck": "react-router typegen && tsc",
+    "db": "cd database && docker-compose up",
+    "db:stop": "docker stop db-container",
+    "db:remove": "docker rm -f db-container",
+    "db:reset": "npm run db:remove && npm run db"
   },
   "dependencies": {
     "@mantine/charts": "^7.17.1",
@@ -18,6 +22,7 @@
     "@react-router/serve": "^7.3.0",
     "@tabler/icons-react": "^3.31.0",
     "dayjs": "^1.11.13",
+    "express": "^4.21.2",
     "isbot": "^5.1.17",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -27,6 +32,7 @@
   "devDependencies": {
     "@react-router/dev": "^7.3.0",
     "@tailwindcss/vite": "^4.0.0",
+    "@types/express": "^5.0.0",
     "@types/node": "^20",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.1",

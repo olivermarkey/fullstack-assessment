@@ -10,5 +10,6 @@ export default [
     index("routes/home.tsx"),
     route("create", "routes/create-material.tsx"),
     route("search", "routes/search.tsx"),
+    route("configuration", "routes/configuration.tsx"),
   ]),
 ] satisfies RouteConfig;

@@ -17,9 +17,17 @@ This repo contains a full-stack web app built with the following technologies:
 ## PostgreSQL
 
 A containerized [postgreSQL](https://www.postgresql.org/) database with a schema and seeding.
+NOTE: The current postgres scripts do not save a volume locally. This means that if the container is deleted all data is lost. This should not be used in production.
 
 ## PostgREST
 
 ## AWS Cognito
 
 ## AG Grid
+
+## System Architecture
+
+```mermaid
+A(PostgREST) --> B(Express Server)
+B --> C(React App)
+```
