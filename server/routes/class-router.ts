@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from "express";
-import { ClassController } from "server/controller/class-controller";
+import { ClassController } from "../controller/class-controller";
 
 const classRouter = Router();
 const classController = new ClassController();

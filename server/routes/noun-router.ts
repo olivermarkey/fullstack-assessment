@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from "express";
-import { NounController } from "server/controller/noun-controller";
+import { NounController } from "../controller/noun-controller";
 
 const nounRouter = Router();
 const nounController = new NounController();

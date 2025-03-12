@@ -30,7 +30,7 @@ export class MaterialController extends BaseController {
   public async getAll(req: Request, res: Response) {
     try {
       const materials = await this.materialModel.findAll();
-      return res.json(materials);
+      return res.json({materials});
     } catch (error) {
       const errorResponse = this.handleError(error as Error);
       return res.status(500).json(errorResponse);

@@ -5,6 +5,7 @@ import classRouter from "./routes/class-router";
 
 const app = express();
 const PORT = process.env.EXPRESS_PORT || 8080;
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -31,6 +32,7 @@ app.use(
     res.status(500).json({ message: "Something went wrong!" });
   }
 );
+
 
 // Start server
 app.listen(PORT, () => {
