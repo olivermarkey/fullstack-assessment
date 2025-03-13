@@ -1,0 +1,34 @@
+{
+  "name": "fullstack-assessment",
+  "version": "1.0.0",
+  "description": "This repo contains a full-stack web app",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "nodemon src/index.ts",
+    "db": "cd database && docker-compose up",
+    "db:stop": "docker stop db-container",
+    "db:remove": "docker rm -f db-container",
+    "db:reset": "npm run db:remove && npm run db"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/olivermarkey/fullstack-assessment.git"
+  },
+  "dependencies": {
+    "@react-router/express": "^7.3.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "morgan": "^1.10.0",
+    "react-router": "^7.3.0",
+    "source-map-support": "^0.5.21",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/morgan": "^1.9.9",
+    "@types/source-map-support": "^0.5.10",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2"
+  }
+}

@@ -1,26 +1,25 @@
 {
-  "name": "fullstack-assessment",
-  "version": "1.0.0",
-  "description": "This repo contains a full-stack web app",
-  "main": "server/index.js",
+  "name": "mono-test",
+  "private": true,
   "scripts": {
-    "server": "nodemon server/index.ts",
-    "db": "cd database && docker-compose up",
-    "db:stop": "docker stop db-container",
-    "db:remove": "docker rm -f db-container",
-    "db:reset": "npm run db:remove && npm run db"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/olivermarkey/fullstack-assessment.git"
-  },
-  "dependencies": {
-    "express": "^4.21.2",
-    "zod": "^3.24.2"
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "server": "turbo run server",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "check-types": "turbo run check-types"
   },
   "devDependencies": {
-    "@types/express": "^5.0.0",
-    "nodemon": "^3.1.9",
-    "ts-node": "^10.9.2"
-  }
+    "prettier": "^3.5.3",
+    "turbo": "^2.4.4",
+    "typescript": "5.8.2"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "npm@10.9.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
 }
