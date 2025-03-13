@@ -2,7 +2,7 @@ import { type Request, type Response } from 'express';
 import { BaseController } from './base-controller';
 import { NounModel } from '../model/noun-model';
 import { z } from 'zod';
-import { createNounSchema, updateNounSchema } from '../model/schemas';
+import { createNounSchema, updateNounSchema } from '@fullstack-assessment/shared';
 
 /**
  * Controller handling all noun-related HTTP requests.

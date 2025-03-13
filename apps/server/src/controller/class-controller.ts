@@ -2,7 +2,7 @@ import { type Request, type Response } from 'express';
 import { BaseController } from './base-controller';
 import { ClassModel } from '../model/class-model';
 import { z } from 'zod';
-import { createClassSchema, updateClassSchema } from '../model/schemas';
+import { createClassSchema, updateClassSchema } from '@fullstack-assessment/shared';
 
 /**
  * Controller handling all class-related HTTP requests.

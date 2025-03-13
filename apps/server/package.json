@@ -1,5 +1,5 @@
 {
-  "name": "fullstack-assessment-server",
+  "name": "server",
   "version": "1.0.0",
   "description": "This repo contains a full-stack web app",
   "main": "src/index.js",

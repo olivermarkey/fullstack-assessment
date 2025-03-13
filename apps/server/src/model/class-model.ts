@@ -6,7 +6,7 @@ import {
   type Class,
   type CreateClass,
   type UpdateClass,
-} from './schemas';
+} from '@fullstack-assessment/shared';
 
 /**
  * Model class for handling Class database operations.

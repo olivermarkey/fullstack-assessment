@@ -6,7 +6,7 @@ import {
   type Noun,
   type CreateNoun,
   type UpdateNoun,
-} from './schemas';
+} from '@fullstack-assessment/shared';
 
 /**
  * Model class for handling Noun database operations.

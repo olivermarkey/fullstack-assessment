@@ -2,7 +2,7 @@ import { type Request, type Response } from 'express';
 import { BaseController } from './base-controller';
 import { MaterialModel } from '../model/material-model';
 import { z } from 'zod';
-import { createMaterialSchema, updateMaterialSchema } from '../model/schemas';
+import { createMaterialSchema, updateMaterialSchema } from '@fullstack-assessment/shared';
 
 /**
  * Controller handling all material-related HTTP requests.
