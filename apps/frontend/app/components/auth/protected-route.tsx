@@ -4,14 +4,14 @@ import { useNavigate } from "react-router";
 
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
+  const { user, signinRedirect } = useAuth();
   let navigate = useNavigate();
 
   useEffect(() => {
     if (!user) {
-      navigate("/login");
+      signinRedirect();
     }
-  }, [user, navigate]);
+  }, [user, signinRedirect]);
 
   return children;
 }

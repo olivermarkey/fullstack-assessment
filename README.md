@@ -55,3 +55,9 @@ npm run build
 npm run start
 ```
 
+
+## Callouts
+
+* Currently there is no testing
+* Key features such as forgot pw are not implemented as they are out of scope.
+
