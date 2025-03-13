@@ -4,7 +4,7 @@ import { ApiClient } from "~/lib/api-client";
 export function Welcome() {
   const [data, setData] = useState<any>(null);
   useEffect(() => {
-    ApiClient.get("")
+    ApiClient.get("/materials")
       .then(setData)
       .catch(error => console.error("Failed to fetch data:", error));
   }, []);

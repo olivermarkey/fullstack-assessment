@@ -1,4 +1,4 @@
-const POSTGREST_URL = 'http://localhost:3000';
+const POSTGREST_URL = 'http://localhost:3001';
 
 class PostgRESTClient {
   private baseURL: string;

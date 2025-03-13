@@ -1,5 +1,5 @@
 {
-  "name": "mono-test",
+  "name": "fullstack-assessment",
   "private": true,
   "scripts": {
     "build": "turbo run build",
@@ -10,7 +10,6 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "db": "cd database && docker-compose up",
-    "db:stop": "docker stop db-container",
     "db:remove": "docker rm -f db-container",
     "db:reset": "npm run db:remove && npm run db"
   },

@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "fullstack-assessment-frontend",
   "private": true,
   "type": "module",
   "scripts": {

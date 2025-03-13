@@ -22,6 +22,8 @@ export class MaterialModel {
    * @throws {Error} When database operation fails or response validation fails
    */
   async findAll(): Promise<Material[]> {
+    console.log('[Material Model] findAll');
+
     const response = await postgrestClient.get<unknown[]>(this.tableName);
     return response.map(item => materialSchema.parse(item));
   }

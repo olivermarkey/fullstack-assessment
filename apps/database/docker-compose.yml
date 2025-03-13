@@ -6,10 +6,10 @@ services:
     container_name: postgrest-container
     image: postgrest/postgrest
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       PGRST_DB_URI: postgres://db_user:password@db:5432/postgresdb
-      PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3000
+      PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3001
       PGRST_DB_ANON_ROLE: db_user
       PGRST_DB_SCHEMA: public
       PGRST_JWT_SECRET: "your-super-secret-jwt-token"

@@ -14,6 +14,7 @@ app.use(
     origin: [
       "http://localhost:5173", // Allow react router dev server
       "http://localhost:3000", // Allow react router prod server
+      "http://localhost:3001", // Allow postgrest server
     ],
     credentials: true,
   })
