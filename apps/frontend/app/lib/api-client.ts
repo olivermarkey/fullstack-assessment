@@ -1,6 +1,4 @@
-const API_URL = import.meta.env.DEV 
-  ? 'http://localhost:8080/api'
-  : '/api'; // In production, use relative path
+const API_URL = 'http://localhost:8080/api'
 
 type RequestOptions = {
   headers?: HeadersInit;

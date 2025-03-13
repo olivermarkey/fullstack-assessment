@@ -5,10 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "nodemon src/index.ts",
-    "db": "cd database && docker-compose up",
-    "db:stop": "docker stop db-container",
-    "db:remove": "docker rm -f db-container",
-    "db:reset": "npm run db:remove && npm run db"
+    "start": "ts-node src/index.ts"
   },
   "repository": {
     "type": "git",
