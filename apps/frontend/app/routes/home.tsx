@@ -1,5 +1,6 @@
 import type { Route } from "./+types/home";
 import { Welcome } from "../components/welcome/welcome";
+import { useAuthContext } from "~/components/auth/auth-provider";
 
 export function meta({}: Route.MetaArgs) {
   return [

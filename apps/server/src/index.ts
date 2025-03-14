@@ -3,6 +3,7 @@ import cors from "cors";
 import materialRouter from "./routes/material-router";
 import nounRouter from "./routes/noun-router";
 import classRouter from "./routes/class-router";
+import authRouter from "./routes/auth-router";
 import morgan from "morgan";
 
 const app = express();
@@ -32,6 +33,8 @@ app.get("/api", (req, res) => {
 app.use("/api/materials", materialRouter);
 app.use("/api/nouns", nounRouter);
 app.use("/api/classes", classRouter);
+// This is not used, but in future it could be used to authenticate API requests.
+app.use("/api/auth", authRouter);
 
 // Error handling middleware
 app.use(

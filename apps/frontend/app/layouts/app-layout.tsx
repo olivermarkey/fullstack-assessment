@@ -1,5 +1,5 @@
 import { Outlet } from "react-router";
-import { AppShell, Burger, Group } from "@mantine/core";
+import { AppShell, Burger, Flex, Group, SimpleGrid } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import NavLinkComponent from "~/components/common/nav-link-component";
 import {
@@ -9,7 +9,7 @@ import {
   IconSettings,
 } from "@tabler/icons-react";
 import ProtectedRoute from "~/components/auth/protected-route";
-
+import { LogoutButton } from "~/components/common/logout-button";
 const navLinks = [
   {
     to: "/",
@@ -49,13 +49,18 @@ export default function ProjectLayout() {
       >
         <AppShell.Header>
           <Group h="100%" px="md">
-            <Burger
-              opened={opened}
-              onClick={toggle}
-              hiddenFrom="sm"
-              size="sm"
-            />
-            <div>FullStack</div>
+            <Flex justify="space-between" align="center" w="100%">
+              <SimpleGrid cols={2}>
+                <Burger
+                  opened={opened}
+                  onClick={toggle}
+                  hiddenFrom="sm"
+                  size="sm"
+              />
+              <div>FullStack</div>
+              </SimpleGrid>
+              <LogoutButton />
+            </Flex>
           </Group>
         </AppShell.Header>
         <AppShell.Navbar p="md">

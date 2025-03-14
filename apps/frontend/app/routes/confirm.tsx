@@ -1,44 +1,31 @@
 import { z } from "zod";
-import type { Route } from "./+types/register";
+import type { Route } from "./+types/confirm";
 import { Button, Card, Stack, Text, TextInput } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
-import { Link, redirect, useFetcher } from "react-router";
-import { RegisterAction } from "../server/auth";
+import { redirect, useFetcher } from "react-router";
+import { ConfirmRegistrationAction } from "../server/auth";
 import { FormError } from "~/components/common/form-error";
 
-export const registerSchema = z.object({
+const confirmSchema = z.object({
   email: z.string().email(),
-  password: z.string()
-    .min(8, "Password must be at least 8 characters")
-    .refine(
-      (password) => {
-        const hasLower = /[a-z]/.test(password);
-        const hasUpper = /[A-Z]/.test(password);
-        const hasNumber = /[0-9]/.test(password);
-        return hasLower && hasUpper && hasNumber;
-      },
-      {
-        message: "Password must contain at least one uppercase letter, one lowercase letter, and one number"
-      }
-    )
+  code: z.string().length(6, "Verification code must be 6 digits")
+    .regex(/^\d+$/, "Verification code must contain only numbers")
 });
-
-// Important to note: password is sent as plain text, this should only be sent over HTTPS.
 
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
   const data = {
     email: String(formData.get("email")),
-    password: String(formData.get("password")),
+    code: String(formData.get("code")),
   };
   try {
-    const result = await RegisterAction(data);
+    const result = await ConfirmRegistrationAction(data);
     if (result.success) {
-      return redirect("/confirm");
+      return redirect("/login");
     }
     return { 
       success: false, 
-      error: result.error || "Registration failed" 
+      error: result.error || "Failed to confirm registration" 
     };
   } catch (error) {
     return { 
@@ -48,16 +35,17 @@ export async function action({ request }: Route.ActionArgs) {
   }
 }
 
-export default function Register() {
+export default function Confirm() {
   let fetcher = useFetcher<{ success: boolean; error: string }>();
   const form = useForm({
-    validate: zodResolver(registerSchema),
+    validate: zodResolver(confirmSchema),
+    // Ideally we would want to prefill the email from the register route.
   });
 
   const onSubmit = (values: typeof form.values) => {
     fetcher.submit(values, {
       method: "post",
-      action: "/register",
+      action: "/confirm",
     });
   };
 
@@ -71,7 +59,7 @@ export default function Register() {
       >
         <Card.Section p="lg">
           <Stack>
-            <Text>Register</Text>
+            <Text>Confirm Account</Text>
             <FormError fetcher={fetcher} />
             <TextInput
               withAsterisk
@@ -82,23 +70,22 @@ export default function Register() {
             />
             <TextInput
               withAsterisk
-              label="Password"
-              placeholder="Password"
-              type="password"
-              key={form.key("password")}
-              {...form.getInputProps("password")}
+              label="Verification Code"
+              placeholder="Enter 6-digit code"
+              key={form.key("code")}
+              {...form.getInputProps("code")}
+              maxLength={6}
+              onChange={(event) => {
+                const cleaned = event.currentTarget.value.replace(/\D/g, "").slice(0, 6);
+                form.setFieldValue("code", cleaned);
+              }}
             />
             <Button 
-              type="submit"
+              type="submit" 
               loading={fetcher.state === "submitting"}
             >
-              Register
+              Verify Account
             </Button>
-            <Link to="/login">
-              <Text size="sm" c="dimmed" td="underline">
-                Already have an account? Login
-              </Text>
-            </Link>
           </Stack>
         </Card.Section>
       </Card>

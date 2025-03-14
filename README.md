@@ -28,7 +28,11 @@ flowchart LR
     C <--> D(Controllers)
     D <--> F(Express Router)
     end
+    subgraph AWS
+    D <--> H(Cognito)
+    end
     subgraph React Router
+    H <--> G
     F <--> G(React Router App)
     end
 ```
@@ -60,4 +64,5 @@ npm run start
 
 * Currently there is no testing
 * Key features such as forgot pw are not implemented as they are out of scope.
+* Whilst the express server is not specifically required as all server logic could be handled in react router server actions, it is useful for separating concerns and allows us to create API endpoints for external services without impacting our frontend server (This would be useful if we needed to frequently connect to a platform like SAP).
 
