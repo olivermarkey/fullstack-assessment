@@ -106,6 +106,9 @@ export default function AuthProvider({
     if (data.user) {
       setUser(data.user);
     }
+
+    // Storing tokens in localStorage is not ideal as it is vulnerable to XSS attacks
+    // We should use a more secure method such as a secure cookie or a server-side session
     localStorage.setItem('auth_tokens', JSON.stringify(formattedTokens));
     localStorage.setItem('user', JSON.stringify(data.user));
   };

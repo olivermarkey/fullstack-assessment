@@ -1,9 +1,11 @@
 import { postgrestClient } from '../utils/postgrest-client';
 import {
   materialSchema,
+  materialWithDetailsSchema,
   createMaterialSchema,
   updateMaterialSchema,
   type Material,
+  type MaterialWithDetails,
   type CreateMaterial,
   type UpdateMaterial,
 } from '@fullstack-assessment/shared';
@@ -17,13 +19,29 @@ export class MaterialModel {
   private readonly tableName = 'material';
 
   /**
-   * Retrieves all materials from the database.
-   * @returns {Promise<Material[]>} Array of materials with validated schema
+   * Retrieves all materials from the database with joined noun and class details.
+   * @returns {Promise<MaterialWithDetails[]>} Array of materials with joined details
    * @throws {Error} When database operation fails or response validation fails
    */
-  async findAll(): Promise<Material[]> {
-    const response = await postgrestClient.get<unknown[]>(this.tableName);
-    return response.map(item => materialSchema.parse(item));
+  async findAll(): Promise<MaterialWithDetails[]> {
+    const query = `${this.tableName}?select=id,material_number,long_text,description,details,noun:noun_id(name),class:class_id(name)`;
+    const response = await postgrestClient.get<unknown[]>(query);
+    
+    // Transform the nested response to flat structure
+    const transformedResponse = response.map(item => {
+      const material = item as any;
+      return {
+        id: material.id,
+        material_number: material.material_number,
+        long_text: material.long_text,
+        description: material.description,
+        details: material.details,
+        noun_name: material.noun.name,
+        class_name: material.class.name,
+      };
+    });
+
+    return transformedResponse.map(item => materialWithDetailsSchema.parse(item));
   }
 
   /**
@@ -84,4 +102,4 @@ export class MaterialModel {
 }
 
 // Export the types
-export type { Material, CreateMaterial, UpdateMaterial };
+export type { Material, CreateMaterial, UpdateMaterial, MaterialWithDetails };

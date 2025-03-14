@@ -24,6 +24,17 @@ export const materialSchema = z.object({
   class_id: z.string(),
 });
 
+// Schema for material with joined details
+export const materialWithDetailsSchema = z.object({
+  id: z.string(),
+  material_number: z.number(),
+  long_text: z.string().nullable(),
+  description: z.string(),
+  details: z.string().nullable(),
+  noun_name: z.string(),
+  class_name: z.string(),
+});
+
 // Input schemas for Noun
 export const createNounSchema = nounSchema.omit({ id: true });
 export const updateNounSchema = nounSchema.partial().omit({ id: true });
@@ -47,4 +58,5 @@ export type UpdateClass = z.infer<typeof updateClassSchema>;
 
 export type Material = z.infer<typeof materialSchema>;
 export type CreateMaterial = z.infer<typeof createMaterialSchema>;
-export type UpdateMaterial = z.infer<typeof updateMaterialSchema>; 
+export type UpdateMaterial = z.infer<typeof updateMaterialSchema>;
+export type MaterialWithDetails = z.infer<typeof materialWithDetailsSchema>; 

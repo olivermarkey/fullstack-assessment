@@ -21,6 +21,11 @@ export default function NavLinkComponent({
           label={label}
           leftSection={<Icon size={16} stroke={1.5} />}
           active={isActive}
+          styles={{
+            root: {
+              borderRadius: 'var(--mantine-radius-md)'
+            }
+          }}
         />
       )}
     </NavLink>

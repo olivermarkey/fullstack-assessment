@@ -15,12 +15,19 @@ class PostgRESTClient {
   }): Promise<T> {
     const { method, params, data, headers = {} } = options;
     
-    // Build URL with query parameters
-    const url = new URL(`${this.baseURL}/${endpoint}`);
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        url.searchParams.append(key, String(value));
-      });
+    // Handle PostgREST specific query parameters
+    let url: URL;
+    if (endpoint.includes('?')) {
+      // If endpoint already contains query parameters, use it as is
+      url = new URL(`${this.baseURL}/${endpoint}`);
+    } else {
+      // Otherwise build URL with query parameters
+      url = new URL(`${this.baseURL}/${endpoint}`);
+      if (params) {
+        Object.entries(params).forEach(([key, value]) => {
+          url.searchParams.append(key, String(value));
+        });
+      }
     }
 
     try {
@@ -29,6 +36,7 @@ class PostgRESTClient {
         headers: {
           'Content-Type': 'application/json',
           'Prefer': 'return=representation',
+          'Accept': 'application/json',
           ...headers,
         },
         ...(data && { body: JSON.stringify(data) }),
