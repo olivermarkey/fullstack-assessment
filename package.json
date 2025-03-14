@@ -9,7 +9,7 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
-    "db": "cd database && docker-compose up",
+    "db": "cd apps/database && docker-compose up",
     "db:remove": "docker rm -f db-container",
     "db:reset": "npm run db:remove && npm run db"
   },

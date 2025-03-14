@@ -53,11 +53,19 @@ export class ApiClient {
       body: JSON.stringify(data),
     });
 
+    const responseData = await response.json();
+
     if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`);
+      if (responseData.errors) {
+        // Format validation errors into a readable message
+        const errorMessages = responseData.errors
+          .map((err: any) => `${err.path.join('.')}: ${err.message}`)
+          .join(', ');
+        throw new Error(errorMessages);
+      }
+      throw new Error(responseData.message || `API Error: ${response.statusText}`);
     }
 
-    const responseData = await response.json();
     return options.schema.parse(responseData);
   }
 

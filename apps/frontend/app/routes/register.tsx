@@ -1,11 +1,12 @@
 import { z } from "zod";
 import type { Route } from "./+types/register";
-import { Button, Card, Stack, Text, TextInput } from "@mantine/core";
+import { Button, Card, PasswordInput, Stack, Text, TextInput } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { Link, redirect, useFetcher } from "react-router";
 import { RegisterAction } from "../server/auth";
 import { FormError } from "~/components/common/form-error";
-
+import { IconEyeOff, IconEye } from "@tabler/icons-react";
+import { useDisclosure } from "@mantine/hooks";
 export const registerSchema = z.object({
   email: z.string().email(),
   password: z.string()
@@ -49,6 +50,7 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function Register() {
+  const [visible, { toggle }] = useDisclosure(false);
   let fetcher = useFetcher<{ success: boolean; error: string }>();
   const form = useForm({
     validate: zodResolver(registerSchema),
@@ -80,11 +82,13 @@ export default function Register() {
               key={form.key("email")}
               {...form.getInputProps("email")}
             />
-            <TextInput
+            <PasswordInput
               withAsterisk
               label="Password"
               placeholder="Password"
-              type="password"
+              visible={visible}
+              onVisibilityChange={toggle}
+              visibilityToggleIcon={({ reveal }) => (reveal ? <IconEyeOff/> : <IconEye />)}
               key={form.key("password")}
               {...form.getInputProps("password")}
             />

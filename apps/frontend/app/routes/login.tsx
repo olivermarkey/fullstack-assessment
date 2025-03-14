@@ -1,12 +1,14 @@
 import { z } from "zod";
 import type { Route } from "./+types/login";
-import { Button, Card, Stack, Text, TextInput } from "@mantine/core";
+import { Button, Card, PasswordInput, Stack, Text, TextInput } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { Link, redirect, useFetcher } from "react-router";
 import { FormError } from "~/components/common/form-error";
 import { LoginAction } from "~/server/auth";
 import { useAuthContext } from "~/components/auth/auth-provider";
 import React from "react";
+import { IconEyeOff, IconEye } from "@tabler/icons-react";
+import { useDisclosure } from "@mantine/hooks";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -41,6 +43,7 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function Login() {
+  const [visible, { toggle }] = useDisclosure(false);
   let fetcher = useFetcher<{ success: boolean; error: string; tokens?: any; user?: any }>();
   const { setTokens } = useAuthContext();
   const form = useForm({
@@ -84,11 +87,13 @@ export default function Login() {
               key={form.key("email")}
               {...form.getInputProps("email")}
             />
-            <TextInput
+            <PasswordInput
               withAsterisk
               label="Password"
               placeholder="Password"
-              type="password"
+              visible={visible}
+              onVisibilityChange={toggle}
+              visibilityToggleIcon={({ reveal }) => (reveal ? <IconEyeOff/> : <IconEye />)}
               key={form.key("password")}
               {...form.getInputProps("password")}
             />

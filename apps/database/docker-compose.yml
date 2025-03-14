@@ -33,4 +33,3 @@ services:
 # Add this volumes section at the root level
 volumes:
   postgres_data:
-
