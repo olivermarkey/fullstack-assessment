@@ -1,6 +1,8 @@
 import { AgGridReact } from "ag-grid-react";
 import { type MaterialWithDetails } from "@fullstack-assessment/shared";
-import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import { ModuleRegistry, AllCommunityModule, type ICellRendererParams } from 'ag-grid-community';
+import { Menu, ActionIcon } from '@mantine/core';
+import { IconDots, IconEdit, IconTrash } from '@tabler/icons-react';
 import "ag-grid-community/styles/ag-grid.css"; // Core grid CSS
 import "ag-grid-community/styles/ag-theme-material.css"; // Material theme
 import "./materials-table.css"; // Custom styles
@@ -10,9 +12,42 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 type MaterialTableProps = {
     materials: MaterialWithDetails[];
+    onEdit?: (material: MaterialWithDetails) => void;
+    onDelete?: (material: MaterialWithDetails) => void;
 }
 
-export function MaterialsTable({ materials }: MaterialTableProps) {
+// Custom cell renderer for the actions column
+const ActionsRenderer = (props: ICellRendererParams) => {
+    const material = props.data as MaterialWithDetails;
+    
+    return (
+        <Menu position="bottom-end" withinPortal>
+            <Menu.Target>
+                <ActionIcon variant="subtle">
+                    <IconDots size="1rem" />
+                </ActionIcon>
+            </Menu.Target>
+
+            <Menu.Dropdown>
+                <Menu.Item
+                    leftSection={<IconEdit size="1rem" />}
+                    onClick={() => props.context.onEdit?.(material)}
+                >
+                    Edit
+                </Menu.Item>
+                <Menu.Item
+                    color="red"
+                    leftSection={<IconTrash size="1rem" />}
+                    onClick={() => props.context.onDelete?.(material)}
+                >
+                    Delete
+                </Menu.Item>
+            </Menu.Dropdown>
+        </Menu>
+    );
+};
+
+export function MaterialsTable({ materials, onEdit, onDelete }: MaterialTableProps) {
   const columnDefs = [
     { 
       headerName: "Material Number", 
@@ -62,6 +97,15 @@ export function MaterialsTable({ materials }: MaterialTableProps) {
       filter: true,
       resizable: true,
       width: 140
+    },
+    {
+      headerName: "Actions",
+      field: "id" as keyof MaterialWithDetails,
+      sortable: false,
+      filter: false,
+      width: 100,
+      cellRenderer: ActionsRenderer,
+      cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center' }
     }
   ];
 
@@ -85,6 +129,7 @@ export function MaterialsTable({ materials }: MaterialTableProps) {
         headerHeight={40}
         rowHeight={40}
         enableCellTextSelection={true}
+        context={{ onEdit, onDelete }}
       />
     </div>
   );

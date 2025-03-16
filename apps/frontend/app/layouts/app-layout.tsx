@@ -17,12 +17,12 @@ const navLinks = [
     icon: IconHome,
   },
   {
-    to: "/search",
+    to: "/material/search",
     label: "Search",
     icon: IconSearch,
   },
   {
-    to: "/create",
+    to: "/material/create",
     label: "Create",
     icon: IconPlus,
   },

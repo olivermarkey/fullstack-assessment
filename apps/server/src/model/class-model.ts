@@ -80,8 +80,11 @@ export class ClassModel {
    */
   async create(data: CreateClass): Promise<Class> {
     const validatedData = createClassSchema.parse(data);
-    const response = await postgrestClient.post<unknown>(this.tableName, validatedData);
-    return classSchema.parse(response);
+    const response = await postgrestClient.post<unknown[]>(this.tableName, validatedData);
+    if (!Array.isArray(response) || response.length === 0) {
+        throw new Error('PostgREST returned an invalid response');
+    }
+    return classSchema.parse(response[0]);
   }
 
   /**

@@ -21,8 +21,15 @@ app.use(
   })
 );
 app.use(morgan("dev"));
+
+// Parse JSON bodies first
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
+// Then parse URL-encoded bodies, but only if content-type matches
+app.use(express.urlencoded({ 
+    extended: true,
+    type: 'application/x-www-form-urlencoded'
+}));
 
 // API Health Check
 app.get("/api", (req, res) => {

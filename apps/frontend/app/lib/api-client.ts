@@ -1,6 +1,6 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-const API_URL = 'http://localhost:8080/api'
+const API_URL = "http://localhost:8080/api";
 
 type RequestOptions = {
   headers?: HeadersInit;
@@ -13,7 +13,7 @@ type ValidatedRequestOptions<T> = RequestOptions & {
 
 export class ApiClient {
   static async get<T>(
-    endpoint: string, 
+    endpoint: string,
     options: ValidatedRequestOptions<T>
   ): Promise<T> {
     const url = new URL(`${API_URL}${endpoint}`);
@@ -24,9 +24,9 @@ export class ApiClient {
     }
 
     const response = await fetch(url.toString(), {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...options.headers,
       },
     });
@@ -40,14 +40,14 @@ export class ApiClient {
   }
 
   static async post<T>(
-    endpoint: string, 
-    data: any, 
+    endpoint: string,
+    data: any,
     options: ValidatedRequestOptions<T>
   ): Promise<T> {
     const response = await fetch(`${API_URL}${endpoint}`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...options.headers,
       },
       body: JSON.stringify(data),
@@ -59,21 +59,27 @@ export class ApiClient {
       if (responseData.errors) {
         // Format validation errors into a readable message
         const errorMessages = responseData.errors
-          .map((err: any) => `${err.path.join('.')}: ${err.message}`)
-          .join(', ');
+          .map((err: any) => `${err.path.join(".")}: ${err.message}`)
+          .join(", ");
         throw new Error(errorMessages);
       }
-      throw new Error(responseData.message || `API Error: ${response.statusText}`);
+      throw new Error(
+        responseData.message || `API Error: ${response.statusText}`
+      );
     }
 
     return options.schema.parse(responseData);
   }
 
-  static async put<T>(endpoint: string, data: any, options: RequestOptions = {}): Promise<T> {
+  static async put<T>(
+    endpoint: string,
+    data: any,
+    options: RequestOptions = {}
+  ): Promise<T> {
     const response = await fetch(`${API_URL}${endpoint}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...options.headers,
       },
       body: JSON.stringify(data),
@@ -86,11 +92,15 @@ export class ApiClient {
     return response.json();
   }
 
-  static async patch<T>(endpoint: string, data: any, options: RequestOptions = {}): Promise<T> {
+  static async patch<T>(
+    endpoint: string,
+    data: any,
+    options: ValidatedRequestOptions<T>
+  ): Promise<T> {
     const response = await fetch(`${API_URL}${endpoint}`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...options.headers,
       },
       body: JSON.stringify(data),
@@ -103,11 +113,14 @@ export class ApiClient {
     return response.json();
   }
 
-  static async delete<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+  static async delete<T>(
+    endpoint: string,
+    options: RequestOptions = {}
+  ): Promise<T> {
     const response = await fetch(`${API_URL}${endpoint}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...options.headers,
       },
     });
@@ -120,11 +133,14 @@ export class ApiClient {
   }
 
   // Helper method for endpoints that return no content
-  static async deleteNoContent(endpoint: string, options: RequestOptions = {}): Promise<void> {
+  static async deleteNoContent(
+    endpoint: string,
+    options: RequestOptions = {}
+  ): Promise<void> {
     const response = await fetch(`${API_URL}${endpoint}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...options.headers,
       },
     });
@@ -135,4 +151,4 @@ export class ApiClient {
   }
 
   // Add other methods as needed (PUT, DELETE, etc.)
-} 
+}

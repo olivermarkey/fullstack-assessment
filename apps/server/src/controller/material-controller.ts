@@ -74,9 +74,11 @@ export class MaterialController extends BaseController {
     try {
       const materialData = createMaterialSchema.parse(req.body);
       const newMaterial = await this.materialModel.create(materialData);
+      console.log("[Material Controller] New Material:", newMaterial);
       return res.status(201).json(newMaterial);
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.log("[Material Controller] Zod Error:", error.errors);
         return res.status(400).json({ 
           message: 'Invalid material data',
           errors: error.errors

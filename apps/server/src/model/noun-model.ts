@@ -56,8 +56,11 @@ export class NounModel {
    */
   async create(data: CreateNoun): Promise<Noun> {
     const validatedData = createNounSchema.parse(data);
-    const response = await postgrestClient.post<unknown>(this.tableName, validatedData);
-    return nounSchema.parse(response);
+    const response = await postgrestClient.post<unknown[]>(this.tableName, validatedData);
+    if (!Array.isArray(response) || response.length === 0) {
+        throw new Error('PostgREST returned an invalid response');
+    }
+    return nounSchema.parse(response[0]);
   }
 
   /**

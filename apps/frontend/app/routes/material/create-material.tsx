@@ -13,41 +13,51 @@ const loaderSchema = z.object({
   nouns: z.array(z.object({
     id: z.string(),
     name: z.string(),
+    active: z.boolean(),
   })),
   classes: z.array(z.object({
     id: z.string(),
     name: z.string(),
     noun_id: z.string(),
+    active: z.boolean(),
   })),
 });
 
 export async function loader() {
   const [nouns, classes] = await Promise.all([
     ApiClient.get("/nouns", {
-      schema: z.array(z.object({ id: z.string(), name: z.string() }))
+      schema: z.array(z.object({ 
+        id: z.string(), 
+        name: z.string(),
+        active: z.boolean() 
+      }))
     }),
     ApiClient.get("/classes", {
       schema: z.array(z.object({ 
         id: z.string(), 
         name: z.string(),
-        noun_id: z.string()
+        noun_id: z.string(),
+        active: z.boolean()
       }))
     })
   ]);
 
   return loaderSchema.parse({
-    nouns: nouns,
-    classes: classes,
+    nouns: nouns.filter(noun => noun.active),
+    classes: classes.filter(cls => cls.active),
   });
 }
 
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
+  
+  // Convert FormData to a proper object with correct types
   const data = {
     material_number: Number(formData.get("material_number")),
     description: String(formData.get("description")),
-    long_text: String(formData.get("long_text")),
-    details: String(formData.get("details")),
+    // Convert empty strings to null for optional fields
+    long_text: formData.get("long_text") ? String(formData.get("long_text")) : null,
+    details: formData.get("details") ? String(formData.get("details")) : null,
     noun_id: String(formData.get("noun_id")),
     class_id: String(formData.get("class_id")),
   };
@@ -70,6 +80,7 @@ export async function action({ request }: Route.ActionArgs) {
     }
     return { success: false, error: "Failed to create material" };
   } catch (error) {
+    console.log("[Create Material Action] Error:", error);
     return { 
       success: false, 
       error: error instanceof Error ? error.message : "An unexpected error occurred" 
@@ -84,6 +95,14 @@ export default function CreateMaterial() {
     
     const form = useForm({
         validate: zodResolver(createMaterialSchema),
+        initialValues: {
+            material_number: 0,
+            description: '',
+            long_text: '',  // Initialize empty but optional
+            details: '',    // Initialize empty but optional
+            noun_id: '',
+            class_id: ''
+        }
     });
 
     // Transform the data for Select components
@@ -107,14 +126,15 @@ export default function CreateMaterial() {
     };
 
     const onSubmit = (values: typeof form.values) => {
-        // Convert empty strings to null for optional fields
-        const formattedValues = {
-            ...values,
-            long_text: values.long_text || null,
-            details: values.details || null
-        };
+        // Create a FormData object
+        const formData = new FormData();
+        Object.entries(values).forEach(([key, value]) => {
+            if (value !== null && value !== undefined && value !== '') {
+                formData.append(key, value.toString());
+            }
+        });
         
-        fetcher.submit(formattedValues, {
+        fetcher.submit(formData, {
             method: "post"
         });
     };
@@ -159,6 +179,7 @@ export default function CreateMaterial() {
                                 placeholder="Enter long text description"
                                 minRows={3}
                                 {...form.getInputProps('long_text')}
+                                required={false}
                             />
 
                             <Textarea
@@ -166,6 +187,7 @@ export default function CreateMaterial() {
                                 placeholder="Enter additional details"
                                 minRows={3}
                                 {...form.getInputProps('details')}
+                                required={false}
                             />
 
                             <Select

@@ -3,7 +3,7 @@ import type { Route } from "./+types/confirm";
 import { Button, Card, Stack, Text, TextInput } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { redirect, useFetcher } from "react-router";
-import { ConfirmRegistrationAction } from "../server/auth";
+import { ConfirmRegistrationAction } from "../../server/auth";
 import { FormError } from "~/components/common/form-error";
 
 const confirmSchema = z.object({

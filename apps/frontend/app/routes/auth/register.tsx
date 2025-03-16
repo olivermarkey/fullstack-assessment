@@ -3,7 +3,7 @@ import type { Route } from "./+types/register";
 import { Button, Card, PasswordInput, Stack, Text, TextInput } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { Link, redirect, useFetcher } from "react-router";
-import { RegisterAction } from "../server/auth";
+import { RegisterAction } from "../../server/auth";
 import { FormError } from "~/components/common/form-error";
 import { IconEyeOff, IconEye } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";

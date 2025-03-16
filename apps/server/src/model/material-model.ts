@@ -64,8 +64,11 @@ export class MaterialModel {
    */
   async create(data: CreateMaterial): Promise<Material> {
     const validatedData = createMaterialSchema.parse(data);
-    const response = await postgrestClient.post<unknown>(this.tableName, validatedData);
-    return materialSchema.parse(response);
+    const response = await postgrestClient.post<unknown[]>(this.tableName, validatedData);
+    if (!Array.isArray(response) || response.length === 0) {
+        throw new Error('PostgREST returned an invalid response');
+    }
+    return materialSchema.parse(response[0]);
   }
 
   /**
