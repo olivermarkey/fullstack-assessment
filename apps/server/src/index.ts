@@ -5,6 +5,7 @@ import nounRouter from "./routes/noun-router";
 import classRouter from "./routes/class-router";
 import authRouter from "./routes/auth-router";
 import morgan from "morgan";
+import { authenticateToken } from "./middleware/auth-middleware";
 
 const app = express();
 const PORT = process.env.EXPRESS_PORT || 8080;
@@ -26,14 +27,21 @@ app.use(morgan("dev"));
 app.use(express.json());
 
 // Then parse URL-encoded bodies, but only if content-type matches
-app.use(express.urlencoded({ 
+app.use(
+  express.urlencoded({
     extended: true,
-    type: 'application/x-www-form-urlencoded'
-}));
+    type: "application/x-www-form-urlencoded",
+  })
+);
 
 // API Health Check
 app.get("/api", (req, res) => {
   res.json({ message: "API is running" });
+});
+
+// Apply auth middleware to all routes after this point
+app.use("/api", (req, res, next) => {
+  authenticateToken(req, res, next);
 });
 
 // API Routes
