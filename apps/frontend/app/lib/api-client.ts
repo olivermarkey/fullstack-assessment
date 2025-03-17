@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const API_URL = "http://localhost:8080/api";
+const API_URL = process.env.API_URL || "http://localhost:8080/api";
 
 type RequestOptions = {
   headers?: HeadersInit;

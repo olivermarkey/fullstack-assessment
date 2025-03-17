@@ -49,14 +49,23 @@ npm run dev
 
 This will start the react application in development mode and the express server in development mode.
 
-## Production
+## Deployment
 
-To run the application in production mode, run the following command:
+To deploy the application on a virtual machine:
 
+1. SSH into VM
+2. Run
 ```bash
-npm install
-npm run build
-npm run start
+sudo apt update
+sudo apt upgrade
+```
+3. Install node (Recommend using NVM)
+4. Clone the repository - your VM should have git installed but you may need to install this
+5. Configure the environment variables in the root .env file and the frontend .env file
+* Each app (i.e. frontend, server, database have their own env file and env.example file. However, in production all apps are run via docker compose, this has been setup so that only the root .env file and the frontend .env file are required - this should all be moved into one env file in the future) 
+6. Run the start script
+```bash
+npm run start:docker
 ```
 
 

@@ -1,13 +1,19 @@
 FROM node:20-alpine
-
 WORKDIR /app
 
-COPY apps/server/package*.json ./
+# Copy package files
+COPY package*.json ./
+COPY apps/server/package*.json ./apps/server/
+COPY packages/shared/package*.json ./packages/shared/
 
-RUN npm install
+# Copy source files
+COPY packages/shared ./packages/shared
+COPY apps/server ./apps/server
 
-COPY apps/server .
+# Install dependencies
+RUN npm ci
 
-EXPOSE 4000
-
-CMD ["npm", "run", "dev"] 
+WORKDIR /app/apps/server
+# Copy the server's package.json to the current working directory
+COPY apps/server/package.json ./
+CMD ["npm", "run", "start"] 

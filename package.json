@@ -6,6 +6,7 @@
     "dev": "turbo run dev",
     "server": "turbo run server",
     "start": "turbo run start",
+    "start:docker": "docker-compose up --build",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "typecheck": "turbo run typecheck",

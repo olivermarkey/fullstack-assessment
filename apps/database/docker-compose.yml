@@ -7,12 +7,10 @@ services:
     image: postgrest/postgrest
     ports:
       - "3001:3000"
+    env_file: 
+      - ./.env
     environment:
-      PGRST_DB_URI: postgres://db_user:password@db:5432/postgresdb
-      PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3001
-      PGRST_DB_ANON_ROLE: db_user
       PGRST_DB_SCHEMA: public
-      PGRST_JWT_SECRET: "your-super-secret-jwt-token"
     depends_on:
       - db
 
@@ -22,10 +20,8 @@ services:
     image: postgres
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_DB: postgresdb
-      POSTGRES_USER: db_user
-      POSTGRES_PASSWORD: password
+    env_file: 
+      - ./.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
