@@ -7,6 +7,7 @@ import { ApiClient } from "~/lib/api-client";
 import { type Noun, type Class, nounSchema, classSchema, createNounSchema, createClassSchema } from "@fullstack-assessment/shared";
 import { IconPlus } from "@tabler/icons-react";
 import { FormError } from "~/components/common/form-error";
+import { getAccessTokenFromCookie } from "~/lib/get-cookie";
 
 // Loader schema
 const loaderSchema = z.object({
@@ -15,14 +16,16 @@ const loaderSchema = z.object({
 });
 
 export async function loader({ request }: { request: Request }) {
+  const accessToken = getAccessTokenFromCookie(request);
+  
   const [nouns, classes] = await Promise.all([
     ApiClient.get("/nouns", { 
       schema: z.array(nounSchema),
-      request
+      accessToken
     }),
     ApiClient.get("/classes", { 
       schema: z.array(classSchema),
-      request
+      accessToken
     })
   ]);
 
@@ -32,6 +35,7 @@ export async function loader({ request }: { request: Request }) {
 export async function action({ request }: { request: Request }) {
   const formData = await request.formData();
   const intent = formData.get("intent");
+  const accessToken = getAccessTokenFromCookie(request);
 
   try {
     if (intent === "createNoun") {
@@ -41,7 +45,7 @@ export async function action({ request }: { request: Request }) {
       };
       await ApiClient.post("/nouns", data, { 
         schema: nounSchema,
-        request
+        accessToken
       });
     } else if (intent === "createClass") {
       const data = {
@@ -51,7 +55,7 @@ export async function action({ request }: { request: Request }) {
       };
       await ApiClient.post("/classes", data, { 
         schema: classSchema,
-        request
+        accessToken
       });
     } else if (intent === "updateNoun") {
       const data = {
@@ -60,7 +64,7 @@ export async function action({ request }: { request: Request }) {
       const id = String(formData.get("id"));
       await ApiClient.patch(`/nouns/${id}`, data, { 
         schema: nounSchema,
-        request
+        accessToken
       });
     } else if (intent === "updateClass") {
       const data = {
@@ -69,7 +73,7 @@ export async function action({ request }: { request: Request }) {
       const id = String(formData.get("id"));
       await ApiClient.patch(`/classes/${id}`, data, { 
         schema: classSchema,
-        request
+        accessToken
       });
     }
     return { success: true };

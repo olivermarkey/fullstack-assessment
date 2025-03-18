@@ -7,6 +7,7 @@ import { createMaterialSchema } from "@fullstack-assessment/shared";
 import { ApiClient } from "~/lib/api-client";
 import type { Route } from "./+types/create-material";
 import React from "react";
+import { getAccessTokenFromCookie } from "~/lib/get-cookie";
 
 // Update the loader response schema
 const loaderSchema = z.object({
@@ -24,6 +25,8 @@ const loaderSchema = z.object({
 });
 
 export async function loader({ request }: Route.LoaderArgs) {
+  const accessToken = getAccessTokenFromCookie(request);
+  
   const [nouns, classes] = await Promise.all([
     ApiClient.get("/nouns", {
       schema: z.array(z.object({ 
@@ -31,7 +34,7 @@ export async function loader({ request }: Route.LoaderArgs) {
         name: z.string(),
         active: z.boolean() 
       })),
-      request
+      accessToken
     }),
     ApiClient.get("/classes", {
       schema: z.array(z.object({ 
@@ -40,7 +43,7 @@ export async function loader({ request }: Route.LoaderArgs) {
         noun_id: z.string(),
         active: z.boolean()
       })),
-      request
+      accessToken
     })
   ]);
 
@@ -52,6 +55,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
+  const accessToken = getAccessTokenFromCookie(request);
   
   const data = {
     material_number: Number(formData.get("material_number")),
@@ -73,7 +77,7 @@ export async function action({ request }: Route.ActionArgs) {
         noun_id: z.string(),
         class_id: z.string(),
       }),
-      request
+      accessToken
     });
 
     if (response) {

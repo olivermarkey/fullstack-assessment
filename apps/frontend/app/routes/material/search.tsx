@@ -6,13 +6,17 @@ import { ApiClient } from "~/lib/api-client";
 import { z } from "zod";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
+import { getAccessTokenFromCookie } from "~/lib/get-cookie";
+
+
 
 export async function loader({ request }: { request: Request }) {
+  const accessToken = getAccessTokenFromCookie(request);
   const response = await ApiClient.get("/materials", {
     schema: z.object({
       materials: z.array(materialWithDetailsSchema)
     }),
-    request
+    accessToken
   });
   return response;
 }
@@ -20,9 +24,10 @@ export async function loader({ request }: { request: Request }) {
 export async function action({ request }: { request: Request }) {
   const formData = await request.formData();
   const id = formData.get("id");
+  const accessToken = getAccessTokenFromCookie(request);
 
   if (request.method === "DELETE") {
-    await ApiClient.deleteNoContent(`/materials/${id}`, { request });
+    await ApiClient.deleteNoContent(`/materials/${id}`, { accessToken });
     return { success: true };
   }
 

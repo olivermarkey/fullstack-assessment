@@ -9,12 +9,20 @@ import { useAuthContext } from "~/components/auth/auth-provider";
 import React from "react";
 import { IconEyeOff, IconEye } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
-import { commitSession, getSession } from "~/server/session-store";
+import { serialize } from "cookie";
 
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
+
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+  maxAge: 60 * 60 * 24 * 7, // 7 days
+};
 
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
@@ -25,12 +33,15 @@ export async function action({ request }: Route.ActionArgs) {
 
   try {
     const result = await LoginAction(data);
+    console.log('[Login] Login action result:', { success: result.success, hasToken: !!result.tokens?.AccessToken });
+    
     if (result.success && result.tokens?.AccessToken) {
-      const session = await getSession(request);
-      // Only store the access token in the session
-      session.set("auth_tokens", { AccessToken: result.tokens.AccessToken });
+      // Base64 encode the token to ensure it's cookie-safe
+      const encodedToken = Buffer.from(result.tokens.AccessToken).toString('base64');
+      // Create the session cookie with the encoded access token
+      const cookie = serialize('session_id', encodedToken, COOKIE_OPTIONS);
       
-      // Return full tokens and user info to the client
+      // Return tokens and user info to the client
       return new Response(JSON.stringify({ 
         success: true,
         tokens: result.tokens,
@@ -38,7 +49,7 @@ export async function action({ request }: Route.ActionArgs) {
       }), {
         headers: {
           "Content-Type": "application/json",
-          "Set-Cookie": await commitSession(session),
+          "Set-Cookie": cookie,
         },
       });
     }
