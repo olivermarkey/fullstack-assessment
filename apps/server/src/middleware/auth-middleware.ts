@@ -19,20 +19,30 @@ export const authenticateToken = async (
 ) => {
   try {
     const authHeader = req.headers.authorization;
-    const accessToken = authHeader?.split(' ')[1]; // Bearer TOKEN
+    const encodedToken = authHeader?.split(' ')[1]; // Bearer TOKEN
 
-    if (!accessToken) {
+    //console.log('[Auth Middleware] Encoded token:', encodedToken);
+
+    if (!encodedToken) {
       return res.status(401).json({ message: 'No token provided' });
     }
 
-    // Verify the token is valid with Cognito
-    const command = new GetUserCommand({
-      AccessToken: accessToken
-    });
+    try {
+      // Decode the base64 token
+      const accessToken = Buffer.from(encodedToken, 'base64').toString();
 
-    const response = await client.send(command);
-    console.log('[Auth Middleware] Authenticated user:', response?.Username);
-    next();
+      // Verify the token is valid with Cognito
+      const command = new GetUserCommand({
+        AccessToken: accessToken
+      });
+
+      const response = await client.send(command);
+      console.log('[Auth Middleware] Authenticated user:', response?.Username);
+      next();
+    } catch (decodeError) {
+      console.error('[Auth Middleware] Token decode error:', decodeError);
+      return res.status(401).json({ message: 'Invalid token format' });
+    }
     
   } catch (error: any) {
     console.error('[Auth Middleware] error:', error);
