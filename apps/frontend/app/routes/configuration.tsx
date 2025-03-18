@@ -14,10 +14,16 @@ const loaderSchema = z.object({
   classes: z.array(classSchema)
 });
 
-export async function loader() {
+export async function loader({ request }: { request: Request }) {
   const [nouns, classes] = await Promise.all([
-    ApiClient.get("/nouns", { schema: z.array(nounSchema) }),
-    ApiClient.get("/classes", { schema: z.array(classSchema) })
+    ApiClient.get("/nouns", { 
+      schema: z.array(nounSchema),
+      request
+    }),
+    ApiClient.get("/classes", { 
+      schema: z.array(classSchema),
+      request
+    })
   ]);
 
   return loaderSchema.parse({ nouns, classes });
@@ -33,26 +39,38 @@ export async function action({ request }: { request: Request }) {
         name: String(formData.get("name")),
         active: formData.get("active") === "true"
       };
-      await ApiClient.post("/nouns", data, { schema: nounSchema });
+      await ApiClient.post("/nouns", data, { 
+        schema: nounSchema,
+        request
+      });
     } else if (intent === "createClass") {
       const data = {
         name: String(formData.get("name")),
         noun_id: String(formData.get("noun_id")),
         active: formData.get("active") === "true"
       };
-      await ApiClient.post("/classes", data, { schema: classSchema });
+      await ApiClient.post("/classes", data, { 
+        schema: classSchema,
+        request
+      });
     } else if (intent === "updateNoun") {
       const data = {
         active: formData.get("active") === "true"
       };
       const id = String(formData.get("id"));
-      await ApiClient.patch(`/nouns/${id}`, data, { schema: nounSchema });
+      await ApiClient.patch(`/nouns/${id}`, data, { 
+        schema: nounSchema,
+        request
+      });
     } else if (intent === "updateClass") {
       const data = {
         active: formData.get("active") === "true"
       };
       const id = String(formData.get("id"));
-      await ApiClient.patch(`/classes/${id}`, data, { schema: classSchema });
+      await ApiClient.patch(`/classes/${id}`, data, { 
+        schema: classSchema,
+        request
+      });
     }
     return { success: true };
   } catch (error) {

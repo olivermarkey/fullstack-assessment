@@ -31,7 +31,7 @@ export const authenticateToken = async (
     });
 
     const response = await client.send(command);
-    console.log('[Auth Middleware] response:', response);
+    console.log('[Auth Middleware] Authenticated user:', response?.Username);
     next();
     
   } catch (error: any) {

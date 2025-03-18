@@ -1,5 +1,5 @@
 import { Flex, Modal, Button } from "@mantine/core";
-import { useLoaderData, useNavigate } from "react-router";
+import { useLoaderData, useNavigate, useFetcher } from "react-router";
 import { MaterialsTable } from "~/components/search/materials-table";
 import { type MaterialWithDetails, materialWithDetailsSchema } from "@fullstack-assessment/shared";
 import { ApiClient } from "~/lib/api-client";
@@ -7,11 +7,12 @@ import { z } from "zod";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 
-export async function loader() {
+export async function loader({ request }: { request: Request }) {
   const response = await ApiClient.get("/materials", {
     schema: z.object({
       materials: z.array(materialWithDetailsSchema)
-    })
+    }),
+    request
   });
   return response;
 }
@@ -21,7 +22,7 @@ export async function action({ request }: { request: Request }) {
   const id = formData.get("id");
 
   if (request.method === "DELETE") {
-    await ApiClient.delete(`/materials/${id}`);
+    await ApiClient.deleteNoContent(`/materials/${id}`, { request });
     return { success: true };
   }
 
@@ -33,6 +34,7 @@ export default function Search() {
   const navigate = useNavigate();
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedMaterial, setSelectedMaterial] = useState<MaterialWithDetails | null>(null);
+  const fetcher = useFetcher();
 
   const handleEdit = (material: MaterialWithDetails) => {
     navigate(`/material/edit/${material.id}`);
@@ -49,9 +51,9 @@ export default function Search() {
     const formData = new FormData();
     formData.append("id", selectedMaterial.id);
     
-    await fetch("/search", {
+    fetcher.submit(formData, {
       method: "DELETE",
-      body: formData
+      action: "/material/search"
     });
     
     close();
@@ -72,7 +74,13 @@ export default function Search() {
           <div>Are you sure you want to delete this material?</div>
           <Flex gap="md" justify="flex-end">
             <Button variant="outline" onClick={close}>Cancel</Button>
-            <Button color="red" onClick={confirmDelete}>Delete</Button>
+            <Button 
+              color="red" 
+              onClick={confirmDelete}
+              loading={fetcher.state === "submitting"}
+            >
+              Delete
+            </Button>
           </Flex>
         </Flex>
       </Modal>
