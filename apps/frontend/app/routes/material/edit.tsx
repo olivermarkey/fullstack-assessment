@@ -24,17 +24,19 @@ const loaderSchema = z.object({
   })),
 });
 
-export async function loader({ params }: Route.LoaderArgs) {
+export async function loader({ params, request }: Route.LoaderArgs) {
   const [material, nouns, classes] = await Promise.all([
     ApiClient.get(`/materials/${params.id}`, {
       schema: materialSchema,
+      request
     }),
     ApiClient.get("/nouns", {
       schema: z.array(z.object({ 
         id: z.string(), 
         name: z.string(),
         active: z.boolean() 
-      }))
+      })),
+      request
     }),
     ApiClient.get("/classes", {
       schema: z.array(z.object({ 
@@ -42,7 +44,8 @@ export async function loader({ params }: Route.LoaderArgs) {
         name: z.string(),
         noun_id: z.string(),
         active: z.boolean()
-      }))
+      })),
+      request
     })
   ]);
 
@@ -75,7 +78,8 @@ export async function action({ request, params }: Route.ActionArgs) {
 
   try {
     const response = await ApiClient.patch(`/materials/${params.id}`, data, {
-      schema: materialSchema
+      schema: materialSchema,
+      request
     });
 
     if (response) {

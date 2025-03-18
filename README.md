@@ -39,9 +39,8 @@ flowchart LR
 
 ## Development
 
-To run the application in development mode, run the following command:
+To run the application in development mode, clone the repository, configure the environment variables based on the .env.example files and run the following commands:
 
-*This is missing the docker compose file for the postgres database and postgrest api.*
 ```bash
 npm install
 npm run dev
@@ -60,10 +59,15 @@ sudo apt update
 sudo apt upgrade
 ```
 3. Install node (Recommend using NVM)
-4. Clone the repository - your VM should have git installed but you may need to install this
-5. Configure the environment variables in the root .env file and the frontend .env file
+4. Install docker
+5. Clone the repository - your VM should have git installed but you may need to install this
+6. Configure the environment variables in the root .env file and the frontend .env file
 * Each app (i.e. frontend, server, database have their own env file and env.example file. However, in production all apps are run via docker compose, this has been setup so that only the root .env file and the frontend .env file are required - this should all be moved into one env file in the future) 
-6. Run the start script
+7. Install dependencies
+```bash
+npm install
+```
+8. Run the start script
 ```bash
 npm run start:docker
 ```

@@ -23,14 +23,15 @@ const loaderSchema = z.object({
   })),
 });
 
-export async function loader() {
+export async function loader({ request }: Route.LoaderArgs) {
   const [nouns, classes] = await Promise.all([
     ApiClient.get("/nouns", {
       schema: z.array(z.object({ 
         id: z.string(), 
         name: z.string(),
         active: z.boolean() 
-      }))
+      })),
+      request
     }),
     ApiClient.get("/classes", {
       schema: z.array(z.object({ 
@@ -38,7 +39,8 @@ export async function loader() {
         name: z.string(),
         noun_id: z.string(),
         active: z.boolean()
-      }))
+      })),
+      request
     })
   ]);
 
@@ -51,11 +53,9 @@ export async function loader() {
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
   
-  // Convert FormData to a proper object with correct types
   const data = {
     material_number: Number(formData.get("material_number")),
     description: String(formData.get("description")),
-    // Convert empty strings to null for optional fields
     long_text: formData.get("long_text") ? String(formData.get("long_text")) : null,
     details: formData.get("details") ? String(formData.get("details")) : null,
     noun_id: String(formData.get("noun_id")),
@@ -72,7 +72,8 @@ export async function action({ request }: Route.ActionArgs) {
         details: z.string().nullable(),
         noun_id: z.string(),
         class_id: z.string(),
-      })
+      }),
+      request
     });
 
     if (response) {
@@ -142,7 +143,7 @@ export default function CreateMaterial() {
     // Navigate to search page on successful submission
     React.useEffect(() => {
         if (fetcher.data?.success) {
-            navigate('/search');
+            navigate('/material/search');
         }
     }, [fetcher.data, navigate]);
 

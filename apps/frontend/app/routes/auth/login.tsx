@@ -9,6 +9,7 @@ import { useAuthContext } from "~/components/auth/auth-provider";
 import React from "react";
 import { IconEyeOff, IconEye } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
+import { commitSession, getSession } from "~/server/session-store";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -21,14 +22,25 @@ export async function action({ request }: Route.ActionArgs) {
     email: String(formData.get("email")),
     password: String(formData.get("password")),
   };
+
   try {
     const result = await LoginAction(data);
-    if (result.success) {
-      return { 
+    if (result.success && result.tokens?.AccessToken) {
+      const session = await getSession(request);
+      // Only store the access token in the session
+      session.set("auth_tokens", { AccessToken: result.tokens.AccessToken });
+      
+      // Return full tokens and user info to the client
+      return new Response(JSON.stringify({ 
         success: true,
         tokens: result.tokens,
         user: result.user
-      };
+      }), {
+        headers: {
+          "Content-Type": "application/json",
+          "Set-Cookie": await commitSession(session),
+        },
+      });
     }
     return { 
       success: false, 
