@@ -18,10 +18,12 @@ const loginSchema = z.object({
 
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax" as const,
+  secure: true, // Always use secure in modern applications
+  sameSite: "strict" as const,
   path: "/",
   maxAge: 60 * 60 * 24 * 7, // 7 days
+  // Add domain if your frontend and backend are on different domains
+  // domain: process.env.COOKIE_DOMAIN || '.yourdomain.com',
 };
 
 export async function action({ request }: Route.ActionArgs) {
@@ -38,8 +40,19 @@ export async function action({ request }: Route.ActionArgs) {
     if (result.success && result.tokens?.AccessToken) {
       // Base64 encode the token to ensure it's cookie-safe
       const encodedToken = Buffer.from(result.tokens.AccessToken).toString('base64');
+      
       // Create the session cookie with the encoded access token
-      const cookie = serialize('session_id', encodedToken, COOKIE_OPTIONS);
+      const cookie = serialize('session_id', encodedToken, {
+        ...COOKIE_OPTIONS,
+        // Override secure based on environment
+        secure: process.env.NODE_ENV === 'production',
+      });
+      
+      console.log('[Login] Setting cookie with options:', {
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: COOKIE_OPTIONS.sameSite,
+        path: COOKIE_OPTIONS.path
+      });
       
       // Return tokens and user info to the client
       return new Response(JSON.stringify({ 

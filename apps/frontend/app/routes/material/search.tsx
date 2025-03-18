@@ -11,6 +11,8 @@ import { getAccessTokenFromCookie } from "~/lib/get-cookie";
 
 
 export async function loader({ request }: { request: Request }) {
+  console.log('[Search] Request headers:', Object.fromEntries(request.headers.entries()));
+  
   const accessToken = getAccessTokenFromCookie(request);
   const response = await ApiClient.get("/materials", {
     schema: z.object({
