@@ -3,25 +3,16 @@ import { Button, Card, Stack, Text, TextInput, Textarea, NumberInput, Select, Ce
 import { useForm, zodResolver } from "@mantine/form";
 import { useFetcher, useLoaderData, useNavigate } from "react-router";
 import { FormError } from "~/components/common/form-error";
-import { createMaterialSchema } from "@fullstack-assessment/shared";
+import { classSchema, createMaterialSchema, materialSchema, nounSchema } from "@fullstack-assessment/shared";
 import { ApiClient } from "~/lib/api-client";
-import type { Route } from "./+types/create-material";
+import type { Route } from "./+types/create";
 import React from "react";
 import { getAccessTokenFromCookie } from "~/lib/get-cookie";
 
 // Update the loader response schema
 const loaderSchema = z.object({
-  nouns: z.array(z.object({
-    id: z.string(),
-    name: z.string(),
-    active: z.boolean(),
-  })),
-  classes: z.array(z.object({
-    id: z.string(),
-    name: z.string(),
-    noun_id: z.string(),
-    active: z.boolean(),
-  })),
+  nouns: z.array(nounSchema),
+  classes: z.array(classSchema),
 });
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -29,20 +20,11 @@ export async function loader({ request }: Route.LoaderArgs) {
   
   const [nouns, classes] = await Promise.all([
     ApiClient.get("/nouns", {
-      schema: z.array(z.object({ 
-        id: z.string(), 
-        name: z.string(),
-        active: z.boolean() 
-      })),
+      schema: z.array(nounSchema),
       accessToken
     }),
     ApiClient.get("/classes", {
-      schema: z.array(z.object({ 
-        id: z.string(), 
-        name: z.string(),
-        noun_id: z.string(),
-        active: z.boolean()
-      })),
+      schema: z.array(classSchema),
       accessToken
     })
   ]);
@@ -68,15 +50,7 @@ export async function action({ request }: Route.ActionArgs) {
 
   try {
     const response = await ApiClient.post("/materials", data, {
-      schema: z.object({
-        id: z.string(),
-        material_number: z.number(),
-        description: z.string(),
-        long_text: z.string().nullable(),
-        details: z.string().nullable(),
-        noun_id: z.string(),
-        class_id: z.string(),
-      }),
+      schema: materialSchema,
       accessToken
     });
 
@@ -97,9 +71,17 @@ export default function CreateMaterial() {
     const { nouns, classes } = useLoaderData<typeof loader>();
     const fetcher = useFetcher();
     const navigate = useNavigate();
+
+    const formSchema = createMaterialSchema.extend({
+        material_number: z.number().min(1, { message: "Material number is required and must be greater than 0" }),
+        description: z.string().min(1, { message: "Description is required" }),
+        noun_id: z.string().min(1, { message: "Noun selection is required" }),
+        class_id: z.string().min(1, { message: "Class selection is required" })
+    });
     
     const form = useForm({
-        validate: zodResolver(createMaterialSchema),
+        validate: zodResolver(formSchema),
+        mode: "controlled",
         initialValues: {
             material_number: 0,
             description: '',
@@ -201,7 +183,7 @@ export default function CreateMaterial() {
                                 data={nounOptions}
                                 withAsterisk
                                 searchable
-                                value={form.values.noun_id}
+                                {...form.getInputProps('noun_id')}
                                 onChange={handleNounChange}
                             />
 
@@ -212,7 +194,7 @@ export default function CreateMaterial() {
                                 withAsterisk
                                 searchable
                                 disabled={!form.values.noun_id}
-                                value={form.values.class_id}
+                                {...form.getInputProps('class_id')}
                                 onChange={(value) => form.setFieldValue('class_id', value || '')}
                             />
 

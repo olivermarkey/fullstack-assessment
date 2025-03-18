@@ -12,7 +12,7 @@ export default [
     ...prefix("material", [
       route("search", "routes/material/search.tsx"),
       route("edit/:id", "routes/material/edit.tsx"),
-      route("create", "routes/material/create-material.tsx"),
+      route("create", "routes/material/create.tsx"),
     ]),
     route("configuration", "routes/configuration.tsx"),
   ]),
