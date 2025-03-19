@@ -9,14 +9,19 @@ materialRouter.get("/", (req: Request, res: Response) => {
   materialController.getAll(req, res);
 });
 
-// Get material by ID
-materialRouter.get("/:id", (req: Request, res: Response) => {
-  materialController.getById(req, res);
-});
-
 // Create new material
 materialRouter.post("/", (req: Request, res: Response) => {
   materialController.create(req, res);
+});
+
+// Bulk Enrichment - specific route before /:id
+materialRouter.get("/bulk-enrichment", (req: Request, res: Response) => {
+  materialController.bulkEnrichment(req, res);
+});
+
+// Get material by ID - parameterized routes after specific routes
+materialRouter.get("/:id", (req: Request, res: Response) => {
+  materialController.getById(req, res);
 });
 
 // Update material

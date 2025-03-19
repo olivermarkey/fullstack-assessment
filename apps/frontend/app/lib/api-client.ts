@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { redirect } from "react-router";
 
 const API_URL = process.env.API_URL || "http://localhost:8080/api";
 
@@ -11,6 +12,13 @@ type RequestOptions = {
 type ValidatedRequestOptions<T> = RequestOptions & {
   schema: z.ZodType<T>;
 };
+
+class AuthError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AuthError";
+  }
+}
 
 export class ApiClient {
   static async get<T>(
@@ -30,7 +38,7 @@ export class ApiClient {
     });
 
     if (options.accessToken) {
-      headers.set('Authorization', `Bearer ${options.accessToken}`);
+      headers.set("Authorization", `Bearer ${options.accessToken}`);
     }
 
     const response = await fetch(url.toString(), {
@@ -39,6 +47,9 @@ export class ApiClient {
     });
 
     if (!response.ok) {
+      if (response.status === 401) {
+        throw redirect("/logout");
+      }
       throw new Error(`API Error: ${response.statusText}`);
     }
 
@@ -57,7 +68,7 @@ export class ApiClient {
     });
 
     if (options.accessToken) {
-      headers.set('Authorization', `Bearer ${options.accessToken}`);
+      headers.set("Authorization", `Bearer ${options.accessToken}`);
     }
 
     const response = await fetch(`${API_URL}${endpoint}`, {
@@ -69,6 +80,9 @@ export class ApiClient {
     const responseData = await response.json();
 
     if (!response.ok) {
+      if (response.status === 401) {
+        throw redirect("/logout");
+      }
       if (responseData.errors) {
         // Format validation errors into a readable message
         const errorMessages = responseData.errors
@@ -95,7 +109,7 @@ export class ApiClient {
     });
 
     if (options.accessToken) {
-      headers.set('Authorization', `Bearer ${options.accessToken}`);
+      headers.set("Authorization", `Bearer ${options.accessToken}`);
     }
 
     const response = await fetch(`${API_URL}${endpoint}`, {
@@ -105,6 +119,9 @@ export class ApiClient {
     });
 
     if (!response.ok) {
+      if (response.status === 401) {
+        throw redirect("/logout");
+      }
       throw new Error(`API Error: ${response.statusText}`);
     }
 
@@ -122,7 +139,7 @@ export class ApiClient {
     });
 
     if (options.accessToken) {
-      headers.set('Authorization', `Bearer ${options.accessToken}`);
+      headers.set("Authorization", `Bearer ${options.accessToken}`);
     }
 
     const response = await fetch(`${API_URL}${endpoint}`, {
@@ -132,6 +149,9 @@ export class ApiClient {
     });
 
     if (!response.ok) {
+      if (response.status === 401) {
+        throw redirect("/logout");
+      }
       throw new Error(`API Error: ${response.statusText}`);
     }
 
@@ -148,7 +168,7 @@ export class ApiClient {
     });
 
     if (options.accessToken) {
-      headers.set('Authorization', `Bearer ${options.accessToken}`);
+      headers.set("Authorization", `Bearer ${options.accessToken}`);
     }
 
     const response = await fetch(`${API_URL}${endpoint}`, {
@@ -157,6 +177,9 @@ export class ApiClient {
     });
 
     if (!response.ok) {
+      if (response.status === 401) {
+        throw redirect("/logout");
+      }
       throw new Error(`API Error: ${response.statusText}`);
     }
 
@@ -174,7 +197,7 @@ export class ApiClient {
     });
 
     if (options.accessToken) {
-      headers.set('Authorization', `Bearer ${options.accessToken}`);
+      headers.set("Authorization", `Bearer ${options.accessToken}`);
     }
 
     const response = await fetch(`${API_URL}${endpoint}`, {
@@ -183,6 +206,9 @@ export class ApiClient {
     });
 
     if (!response.ok) {
+      if (response.status === 401) {
+        throw redirect("/logout");
+      }
       throw new Error(`API Error: ${response.statusText}`);
     }
   }

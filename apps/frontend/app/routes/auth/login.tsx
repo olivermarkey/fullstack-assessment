@@ -86,7 +86,10 @@ export default function Login() {
   });
 
   const onSubmit = (values: typeof form.values) => {
-    fetcher.submit(values, {
+    fetcher.submit({
+      ...values,
+      email: values.email.toLowerCase()
+    }, {
       method: "post",
       action: "/login",
     });
@@ -98,7 +101,10 @@ export default function Login() {
       console.log('Login success data:', fetcher.data); // Debug log
       setTokens({
         tokens: fetcher.data.tokens,
-        user: fetcher.data.user
+        user: {
+          ...fetcher.data.user,
+          email: fetcher.data.user.email.toLowerCase()
+        }
       });
     }
   }, [fetcher.data, setTokens]);
