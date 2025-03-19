@@ -1,4 +1,4 @@
-import { Button, Tooltip } from "@mantine/core";
+import { Tooltip } from "@mantine/core";
 import { NavLink } from "react-router";
 import { NavLink as NavLinkButton } from "@mantine/core";
 
@@ -27,11 +27,11 @@ export default function NavLinkComponent({
             root: {
               borderRadius: 'var(--mantine-radius-md)',
               width: collapsed ? '48px' : '100%',
-              padding: '12px',
+              padding: collapsed ? '12px' : '8px',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              margin: '4px 0'
+              margin: '2px 0'
             },
             section: {
               marginRight: collapsed ? 0 : undefined
