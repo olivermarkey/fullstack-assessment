@@ -2,6 +2,7 @@ import { Outlet } from "react-router";
 import { AppShell, Burger, Flex, Group, Box, Breadcrumbs, Anchor } from "@mantine/core";
 import { useDisclosure, useViewportSize } from "@mantine/hooks";
 import NavLinkComponent from "~/components/common/nav-link-component";
+import { AppBreadcrumbs } from "~/components/common/breadcrumbs";
 import {
   IconHome,
   IconPlus,
@@ -113,11 +114,7 @@ export default function ProjectLayout() {
                 zIndex: 2,
               }}
             >
-              <Breadcrumbs>
-                <Anchor href="/">Home</Anchor>
-                <Anchor href="#">Breadcrumb 2</Anchor>
-                <Anchor href="#">Breadcrumb 3</Anchor>
-              </Breadcrumbs>
+              <AppBreadcrumbs />
               <LogoutButton />
             </Flex>
           </Flex>

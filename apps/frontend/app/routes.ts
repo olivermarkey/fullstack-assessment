@@ -10,6 +10,7 @@ export default [
   layout("./layouts/app-layout.tsx", [
     index("routes/home.tsx"),
     ...prefix("material", [
+      index("routes/material/index.tsx"),
       route("search", "routes/material/search.tsx"),
       route("edit/:id", "routes/material/edit.tsx"),
       route("create", "routes/material/create.tsx"),
