@@ -3,7 +3,7 @@
   --ag-row-height: 40px;
   --ag-header-column-separator-display: block;
   --ag-font-size: 13px;
-  --ag-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --ag-font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --ag-grid-size: 4px;
   --ag-cell-horizontal-padding: 16px;
   --ag-borders: solid 1px;
@@ -15,13 +15,13 @@
   --ag-header-background-color: #f8f9fa;
   --ag-odd-row-background-color: white;
   --ag-header-foreground-color: #868e96;
-  --ag-foreground-color: #212529;
+  --ag-foreground-color: #1C232C;
   --ag-row-hover-color: #f8f9fa;
-  --ag-border-radius: 8px;
+  --ag-border-radius: 0;
   width: 100%;
   height: 600px;
-  border: 1px solid #e9ecef;
-  border-radius: 8px;
+  border: none;
+  border-radius: 0;
 }
 
 .ag-header-cell {

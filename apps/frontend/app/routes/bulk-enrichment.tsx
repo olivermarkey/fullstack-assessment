@@ -4,20 +4,14 @@ import { getAccessTokenFromCookie } from "~/lib/get-cookie";
 import { ApiClient } from "~/lib/api-client";
 import { Form, useNavigation } from "react-router";
 import { useEffect, useRef } from "react";
+import { z } from "zod";
 
 export async function action({ request }: Route.ClientActionArgs) {
   const accessToken = getAccessTokenFromCookie(request);
   
-  // Get the response as a blob
-  const response = await fetch(`${process.env.API_URL || 'http://localhost:8080/api'}/materials/bulk-enrichment`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+  const response = await ApiClient.getBinary('/materials/bulk-enrichment', {
+    accessToken,
   });
-
-  if (!response.ok) {
-    throw new Error('Failed to download template');
-  }
 
   // Convert the response to base64
   const blob = await response.blob();

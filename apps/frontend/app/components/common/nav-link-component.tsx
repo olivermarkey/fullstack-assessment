@@ -23,7 +23,8 @@ export default function NavLinkComponent({
           label={!collapsed ? label : undefined}
           leftSection={<Icon size={20} stroke={1.5} />}
           active={isActive}
-          styles={{
+          color="custom-primary"
+          styles={(theme) => ({
             root: {
               borderRadius: 'var(--mantine-radius-md)',
               width: collapsed ? '48px' : '100%',
@@ -31,15 +32,22 @@ export default function NavLinkComponent({
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              margin: '2px 0'
+              margin: '2px 0',
+              color: isActive ? theme.colors['custom-primary'][5] : theme.colors['custom-grey'][5],
+              backgroundColor: isActive ? theme.colors['custom-primary'][0] : 'transparent',
+              '&:hover': {
+                backgroundColor: isActive ? theme.colors['custom-primary'][1] : theme.colors['custom-grey'][0],
+              }
             },
             section: {
-              marginRight: collapsed ? 0 : undefined
+              marginRight: collapsed ? 0 : undefined,
+              color: 'inherit'
             },
             label: {
-              flex: 1
+              flex: 1,
+              color: 'inherit'
             }
-          }}
+          })}
         />
       )}
     </NavLink>

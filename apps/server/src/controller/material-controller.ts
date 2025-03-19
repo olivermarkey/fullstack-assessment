@@ -170,6 +170,7 @@ export class MaterialController extends BaseController {
       const workbook = new ExcelJS.Workbook();
       const sheet1 = workbook.addWorksheet("Materials");
       const sheet2 = workbook.addWorksheet("Lists");
+      const sheet3 = workbook.addWorksheet("Attributes");
 
       // Define Columns in Sheet1
       sheet1.columns = [
@@ -177,6 +178,35 @@ export class MaterialController extends BaseController {
         { header: "Noun", key: "noun", width: 32 },
         { header: "Class", key: "class", width: 32 },
       ];
+
+      // Add ball valve attributes (we'll make this dynamic later)
+      // This will obviously also be loaded from the database, but I don't know what every attribute is for every
+      // noun modifier combination, so I'm just going to hardcode it for now.
+      const ballValveAttributes = [
+        "Actuator Type",
+        "Pressure Rating",
+        "End Connection",
+        "Port Type",
+        "Body Material",
+        "Trim Material",
+        "End to End Distance",
+        "Configuration",
+        "Design Pressure Range",
+        "Temperature Rating",
+        "Standards",
+        "Manufacturer"
+      ];
+
+      // Add attribute columns with generic headers
+      ballValveAttributes.forEach((attr, index) => {
+        const colIndex = index * 2 + 4; // Start after Material Number, Noun, Class columns
+        sheet1.getColumn(colIndex).width = 20;
+        sheet1.getColumn(colIndex + 1).width = 20;
+        
+        // Set generic headers for attribute and value columns
+        sheet1.getCell(1, colIndex).value = `Attribute ${index + 1}`;
+        sheet1.getCell(1, colIndex + 1).value = `Value ${index + 1}`;
+      });
 
       // Add existing materials data
       materials.forEach(material => {
@@ -215,8 +245,23 @@ export class MaterialController extends BaseController {
         }
       });
 
-      // Hide the Lists sheet
+      // --- Configure Sheet3 (Attributes) ---
+      sheet3.getCell('A1').value = 'Noun';
+      sheet3.getCell('B1').value = 'Class';
+      sheet3.getCell('C1').value = 'Attribute';
+      
+      // Add ball valve attributes
+      let attrRow = 2;
+      sheet3.getCell(`A${attrRow}`).value = 'Valve';
+      sheet3.getCell(`B${attrRow}`).value = 'Ball';
+      ballValveAttributes.forEach(attr => {
+        sheet3.getCell(`C${attrRow}`).value = attr;
+        attrRow++;
+      });
+
+      // Hide the reference sheets
       sheet2.state = 'hidden';
+      sheet3.state = 'hidden';
 
       // Add data validation for Noun column (Column B)
       for (let i = 2; i <= 1000; i++) {
@@ -234,6 +279,19 @@ export class MaterialController extends BaseController {
           allowBlank: true,
           formulae: [`=OFFSET(Lists!$C$2,0,MATCH(B${i},Lists!$C$1:$Z$1,0)-1,COUNTIF(OFFSET(Lists!$C$2,0,MATCH(B${i},Lists!$C$1:$Z$1,0)-1,100),"<>"),1)`]
         };
+      }
+
+      // Add conditional formatting to show/hide attribute columns
+      for (let i = 2; i <= 1000; i++) {
+        for (let j = 0; j < ballValveAttributes.length; j++) {
+          const attrCol = j * 2 + 4;
+          const valueCol = attrCol + 1;
+          
+          // Show attribute name only when noun is "Valve" and class is "Ball"
+          sheet1.getCell(i, attrCol).value = {
+            formula: `=IF(AND(B${i}="Valve",C${i}="Ball"),INDEX(Attributes!$C$2:$C$${attrRow-1},MATCH(1,INDEX((Attributes!$A$2:$A$${attrRow-1}="Valve")*(Attributes!$B$2:$B$${attrRow-1}="Ball"),0,1),0)+${j}),"")`
+          };
+        }
       }
 
       // Set headers for download with no-cache directives

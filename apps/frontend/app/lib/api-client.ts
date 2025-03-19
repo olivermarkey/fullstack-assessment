@@ -213,5 +213,39 @@ export class ApiClient {
     }
   }
 
+  static async getBinary(
+    endpoint: string,
+    options: RequestOptions = {}
+  ): Promise<Response> {
+    const url = new URL(`${API_URL}${endpoint}`);
+    if (options.params) {
+      Object.entries(options.params).forEach(([key, value]) => {
+        url.searchParams.append(key, value);
+      });
+    }
+
+    const headers = new Headers({
+      ...options.headers,
+    });
+
+    if (options.accessToken) {
+      headers.set("Authorization", `Bearer ${options.accessToken}`);
+    }
+
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers,
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw redirect("/logout");
+      }
+      throw new Error(`API Error: ${response.statusText}`);
+    }
+
+    return response;
+  }
+
   // Add other methods as needed (PUT, DELETE, etc.)
 }

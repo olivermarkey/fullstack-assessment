@@ -1,4 +1,4 @@
-import { Flex, Modal, Button } from "@mantine/core";
+import { Flex, Modal, Button, Card, TextInput, Text, Switch, Menu, ActionIcon } from "@mantine/core";
 import { useLoaderData, useNavigate, useFetcher } from "react-router";
 import { MaterialsTable } from "~/components/search/materials-table";
 import { type MaterialWithDetails, materialWithDetailsSchema } from "@fullstack-assessment/shared";
@@ -7,8 +7,7 @@ import { z } from "zod";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { getAccessTokenFromCookie } from "~/lib/get-cookie";
-
-
+import { IconSearch, IconColumns, IconDots } from '@tabler/icons-react';
 
 export async function loader({ request }: { request: Request }) {
   console.log('[Search] Request headers:', Object.fromEntries(request.headers.entries()));
@@ -70,11 +69,46 @@ export default function Search() {
 
   return (
     <Flex direction="column" gap="md">
-      <MaterialsTable 
-        materials={materials} 
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      <Card p={0} radius="sm" withBorder>
+        <Flex direction="column">
+          <Flex justify="space-between" align="center" p="md" mb="md">
+            <Text size="lg" fw={500}>Materials</Text>
+            <ActionIcon variant="subtle">
+              <IconDots size={20} />
+            </ActionIcon>
+          </Flex>
+          
+          <Flex gap="md" align="center" px="md" mb="lg">
+            <TextInput
+              placeholder="Search"
+              leftSection={<IconSearch size={16} />}
+              style={{ flex: 1 }}
+            />
+            <Flex gap="md" align="center">
+              <Menu>
+                <Menu.Target>
+                  <Button variant="default" leftSection={<IconColumns size={16} />}>
+                    Columns
+                  </Button>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Item>Material Number</Menu.Item>
+                  <Menu.Item>Long Text</Menu.Item>
+                  <Menu.Item>Description</Menu.Item>
+                  <Menu.Item>Tags</Menu.Item>
+                  <Menu.Item>Action</Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            </Flex>
+          </Flex>
+
+          <MaterialsTable 
+            materials={materials} 
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </Flex>
+      </Card>
 
       <Modal opened={opened} onClose={close} title="Delete Material">
         <Flex direction="column" gap="md">
