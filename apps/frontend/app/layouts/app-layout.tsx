@@ -1,12 +1,10 @@
-import { Outlet, useNavigate, useLocation } from "react-router";
+import { Outlet, useLocation } from "react-router";
 import {
   AppShell,
   Burger,
   Flex,
   Group,
   Box,
-  Breadcrumbs,
-  Anchor,
   Stack,
 } from "@mantine/core";
 import { useDisclosure, useViewportSize } from "@mantine/hooks";
@@ -18,6 +16,7 @@ import {
   IconPlus,
   IconSearch,
   IconSettings,
+  IconAdjustments,
 } from "@tabler/icons-react";
 import ProtectedRoute from "~/components/auth/protected-route";
 import { useEffect } from "react";
@@ -37,6 +36,11 @@ const navLinks = [
     to: "/material/create",
     label: "Create",
     icon: IconPlus,
+  },
+  {
+    to: "/bulk-enrichment",
+    label: "Bulk Enrichment",
+    icon: IconAdjustments,
   },
   {
     to: "/configuration",

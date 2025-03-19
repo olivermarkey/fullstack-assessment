@@ -16,10 +16,12 @@ export default [
       route("create", "routes/material/create.tsx"),
     ]),
     route("configuration", "routes/configuration.tsx"),
+    route("bulk-enrichment", "routes/bulk-enrichment.tsx"),
   ]),
   layout("./layouts/auth-layout.tsx", [
     route("register", "routes/auth/register.tsx"),
     route("confirm", "routes/auth/confirm.tsx"),
     route("login", "routes/auth/login.tsx"),
+    route("logout", "routes/auth/logout.tsx"),
   ]),
 ] satisfies RouteConfig;
