@@ -1,8 +1,15 @@
 import { Router, type Request, type Response } from "express";
 import { MaterialController } from "../controller/material-controller";
+import { SearchController } from "../controller/search-controller";
 
 const materialRouter = Router();
 const materialController = new MaterialController();
+const searchController = new SearchController();
+
+// Search materials - place before other routes to avoid conflicts
+materialRouter.get("/search", (req: Request, res: Response) => {
+  searchController.search(req, res);
+});
 
 // Get all materials
 materialRouter.get("/", (req: Request, res: Response) => {
