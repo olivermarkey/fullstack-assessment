@@ -23,6 +23,44 @@ GRANT ALL ON ALL TABLES IN SCHEMA public TO db_user;
 -- Grant access to future tables
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO db_user;
 
+-- Create extension for levenshtein
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
+
+-- Create function for spell checking
+CREATE OR REPLACE FUNCTION get_spelling_suggestions(search_term text)
+RETURNS TABLE (
+    suggested_word text,
+    distance integer
+) AS $$
+BEGIN
+    RETURN QUERY
+    WITH word_list AS (
+        SELECT DISTINCT word_text as word FROM (
+            SELECT regexp_split_to_table(description, '\s+') as word_text FROM Material
+            UNION
+            SELECT regexp_split_to_table(long_text, '\s+') as word_text FROM Material WHERE long_text IS NOT NULL
+            UNION
+            SELECT regexp_split_to_table(details, '\s+') as word_text FROM Material WHERE details IS NOT NULL
+            UNION
+            SELECT name as word_text FROM Noun
+            UNION
+            SELECT name as word_text FROM Class
+        ) as words
+        WHERE length(word_text) > 2
+    )
+    SELECT 
+        word as suggested_word,
+        levenshtein(lower(search_term), lower(word)) as distance
+    FROM word_list
+    WHERE levenshtein(lower(search_term), lower(word)) <= 3
+    ORDER BY distance ASC
+    LIMIT 5;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Grant execute permission to the PostgREST user
+GRANT EXECUTE ON FUNCTION get_spelling_suggestions(text) TO postgrest_user;
+
 -- Function to generate random string of specified length
 CREATE OR REPLACE FUNCTION random_string(length INTEGER) RETURNS TEXT AS $$
 DECLARE
@@ -78,6 +116,12 @@ CREATE TABLE Material (
     details TEXT,
     noun_id TEXT NOT NULL,
     class_id TEXT NOT NULL,
+    search_vector tsvector GENERATED ALWAYS AS (
+        setweight(to_tsvector('english', coalesce(material_number::text, '')),'A') ||
+        setweight(to_tsvector('english', coalesce(description, '')), 'B') ||
+        setweight(to_tsvector('english', coalesce(long_text, '')), 'C') ||
+        setweight(to_tsvector('english', coalesce(details, '')), 'C')
+    ) STORED,
     CONSTRAINT fk_noun FOREIGN KEY (noun_id) REFERENCES Noun(id) ON DELETE CASCADE,
     CONSTRAINT fk_class FOREIGN KEY (class_id) REFERENCES Class(id) ON DELETE CASCADE
 );
@@ -88,13 +132,58 @@ CREATE INDEX idx_material_class_id ON Material(class_id);
 CREATE INDEX idx_noun_name ON Noun(name);
 CREATE INDEX idx_class_name ON Class(name);
 
+-- Create GIN index for full-text search
+CREATE INDEX idx_material_search ON Material USING GIN(search_vector);
+
+-- Create a materialized view for search that includes noun and class names
+CREATE MATERIALIZED VIEW material_search_view AS
+SELECT 
+    m.*,
+    n.name as noun_name,
+    c.name as class_name,
+    setweight(m.search_vector, 'A') ||
+    setweight(to_tsvector('english', coalesce(n.name, '')), 'B') ||
+    setweight(to_tsvector('english', coalesce(c.name, '')), 'B') as full_search_vector
+FROM Material m
+JOIN Noun n ON m.noun_id = n.id
+JOIN Class c ON m.class_id = c.id;
+
+-- Create a unique index on the id column (required for concurrent refresh)
+CREATE UNIQUE INDEX material_search_view_id_idx ON material_search_view (id);
+
+-- Create index on the materialized view for full-text search
+CREATE INDEX idx_material_search_view ON material_search_view USING GIN(full_search_vector);
+
+-- Function to refresh the materialized view
+CREATE OR REPLACE FUNCTION refresh_material_search_view()
+RETURNS TRIGGER AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW CONCURRENTLY material_search_view;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Triggers to refresh the materialized view
+CREATE TRIGGER refresh_material_search_view_material
+AFTER INSERT OR UPDATE OR DELETE ON Material
+FOR EACH STATEMENT EXECUTE FUNCTION refresh_material_search_view();
+
+CREATE TRIGGER refresh_material_search_view_noun
+AFTER UPDATE OF name ON Noun
+FOR EACH STATEMENT EXECUTE FUNCTION refresh_material_search_view();
+
+CREATE TRIGGER refresh_material_search_view_class
+AFTER UPDATE OF name ON Class
+FOR EACH STATEMENT EXECUTE FUNCTION refresh_material_search_view();
+
 -- Insert sample data without specifying IDs (they will be generated automatically)
 INSERT INTO Noun (name, active) VALUES
 ('Metal', TRUE),
 ('Plastic', TRUE),
 ('Wood', TRUE),
 ('Ceramic', TRUE),
-('Glass', TRUE);
+('Glass', TRUE),
+('Valve', TRUE);
 
 -- We need to get the generated IDs for the nouns to use in the class insertions
 DO $$ 
@@ -104,12 +193,14 @@ DECLARE
     wood_id TEXT;
     ceramic_id TEXT;
     glass_id TEXT;
+    valve_id TEXT;
 BEGIN
     SELECT id INTO metal_id FROM Noun WHERE name = 'Metal';
     SELECT id INTO plastic_id FROM Noun WHERE name = 'Plastic';
     SELECT id INTO wood_id FROM Noun WHERE name = 'Wood';
     SELECT id INTO ceramic_id FROM Noun WHERE name = 'Ceramic';
     SELECT id INTO glass_id FROM Noun WHERE name = 'Glass';
+    SELECT id INTO valve_id FROM Noun WHERE name = 'Valve';
 
     -- Insert classes with the retrieved noun IDs
     -- Metal classes
@@ -141,6 +232,11 @@ BEGIN
     (glass_id, 'Tempered Glass', TRUE),
     (glass_id, 'Laminated Glass', TRUE),
     (glass_id, 'Frosted Glass', TRUE);
+
+    -- Valve classes
+    INSERT INTO Class (noun_id, name, active) VALUES
+    (valve_id, 'Butterfly', TRUE),
+    (valve_id, 'Ball', TRUE);
 
     -- Insert materials using the noun and class IDs
     INSERT INTO Material (material_number, description, long_text, details, noun_id, class_id)
