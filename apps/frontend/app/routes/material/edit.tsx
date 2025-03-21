@@ -105,11 +105,9 @@ export default function EditMaterial() {
   const navigate = useNavigate();
 
   const formSchema = createMaterialSchema.extend({
-    material_number: z
-      .number()
-      .min(1, {
-        message: "Material number is required and must be greater than 0",
-      }),
+    material_number: z.number().min(1, {
+      message: "Material number is required and must be greater than 0",
+    }),
     description: z.string().min(1, { message: "Description is required" }),
     noun_id: z.string().min(1, { message: "Noun selection is required" }),
     class_id: z.string().min(1, { message: "Class selection is required" }),

@@ -2,11 +2,11 @@ import { z } from "zod";
 import type { Route } from "./+types/login";
 import { Button, Card, PasswordInput, Stack, Text, TextInput } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
-import { Link, redirect, useFetcher } from "react-router";
+import { Link, useFetcher } from "react-router";
 import { FormError } from "~/components/common/form-error";
 import { LoginAction } from "~/server/auth";
 import { useAuthContext } from "~/components/auth/auth-provider";
-import React from "react";
+import { useEffect } from "react";
 import { IconEyeOff, IconEye } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { serialize } from "cookie";
@@ -83,6 +83,10 @@ export default function Login() {
   const { setTokens } = useAuthContext();
   const form = useForm({
     validate: zodResolver(loginSchema),
+    initialValues: {
+      email: '',
+      password: '',
+    },
   });
 
   const onSubmit = (values: typeof form.values) => {
@@ -96,7 +100,7 @@ export default function Login() {
   };
 
   // Handle successful login
-  React.useEffect(() => {
+  useEffect(() => {
     if (fetcher.data?.success && fetcher.data.tokens) {
       console.log('Login success data:', fetcher.data); // Debug log
       setTokens({

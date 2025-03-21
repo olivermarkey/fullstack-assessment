@@ -5,13 +5,14 @@
  */
 export function getAccessTokenFromCookie(request: Request): string | undefined {
   const cookie = request.headers.get("cookie");
-  console.log("[Get Access Token] Cookie:", cookie);
   if (!cookie) return undefined;
 
   const sessionMatch = cookie.match(/session_id=([^;]+)/);
   return sessionMatch ? sessionMatch[1] : undefined;
 }
 
+// This function does not work. Some form of this function should be created to access the auth cookie
+// from the client.
 /**
  * Gets the access token from the session_id cookie in a client-side context
  * @returns The access token or undefined if not found

@@ -18,22 +18,16 @@ import { z } from "zod";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { getAccessTokenFromCookie } from "~/lib/get-cookie";
-import { IconColumns, IconDots } from "@tabler/icons-react";
+import { IconColumns } from "@tabler/icons-react";
 import { SearchInput } from "~/components/search/search-input";
 import { searchParamsCache } from "~/lib/search-params";
-
+import type { Route } from "./+types/search";
 const searchResponseSchema = z.object({
   materials: z.array(materialWithDetailsSchema),
   corrected: z.string().optional(),
 });
 
-type LoaderData = {
-  materials: MaterialWithDetails[];
-  corrected?: string;
-  isSearching: boolean;
-};
-
-export async function loader({ request }: { request: Request }) {
+export async function loader({ request }: Route.LoaderArgs) {
   const accessToken = getAccessTokenFromCookie(request);
   const url = new URL(request.url);
 
@@ -83,7 +77,7 @@ export async function action({ request }: { request: Request }) {
 }
 
 export default function Search() {
-  const loaderData = useLoaderData<LoaderData>();
+  const loaderData = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedMaterial, setSelectedMaterial] =
@@ -91,8 +85,6 @@ export default function Search() {
   const fetcher = useFetcher();
 
   const materials = loaderData.materials;
-  const correctedTerm = loaderData.corrected;
-  const isSearching = loaderData.isSearching;
 
   const handleEdit = (material: MaterialWithDetails) => {
     navigate(`/material/edit/${material.id}`);
@@ -149,10 +141,7 @@ export default function Search() {
             </Flex>
           </Flex>
           <Flex direction="column" gap="xs" px="md" mb="lg">
-            <SearchInput
-              isSearching={isSearching}
-              correctedTerm={correctedTerm}
-            />
+            <SearchInput />
           </Flex>
 
           <MaterialsTable

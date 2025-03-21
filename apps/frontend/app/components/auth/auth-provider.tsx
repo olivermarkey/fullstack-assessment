@@ -109,6 +109,7 @@ export default function AuthProvider({
   };
 
   const logout = () => {
+    console.log("[AuthProvider] Logging out");
     setTokensState({
       accessToken: undefined,
       idToken: undefined,

@@ -17,40 +17,30 @@ export const authenticateToken = async (
   res: Response,
   next: NextFunction
 ) => {
+  const authHeader = req.headers.authorization;
+  const encodedToken = authHeader?.split(' ')[1]; // Bearer TOKEN
+
+  if (!encodedToken) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
+
   try {
-    const authHeader = req.headers.authorization;
-    const encodedToken = authHeader?.split(' ')[1]; // Bearer TOKEN
-
-    //console.log('[Auth Middleware] Encoded token:', encodedToken);
-
-    if (!encodedToken) {
-      return res.status(401).json({ message: 'No token provided' });
-    }
-
-    try {
-      // Decode the base64 token
-      const accessToken = Buffer.from(encodedToken, 'base64').toString();
-
-      // Verify the token is valid with Cognito
-      const command = new GetUserCommand({
-        AccessToken: accessToken
-      });
-
-      const response = await client.send(command);
-      console.log('[Auth Middleware] Authenticated user:', response?.Username);
-      next();
-    } catch (decodeError) {
-      console.error('[Auth Middleware] Token decode error:', decodeError);
-      return res.status(401).json({ message: 'Invalid token format' });
-    }
+    const accessToken = Buffer.from(encodedToken, 'base64').toString();
+    const command = new GetUserCommand({ AccessToken: accessToken });
+    const response = await client.send(command);
     
+    console.log('[Auth Middleware] Authenticated user:', response?.Username);
+    next();
   } catch (error: any) {
     console.error('[Auth Middleware] error:', error);
     
-    if (error.name === 'NotAuthorizedException') {
-      return res.status(401).json({ message: 'Invalid or expired token' });
-    }
-    
-    return res.status(500).json({ message: 'Authentication error' });
+    const errorResponses = {
+      NotAuthorizedException: { status: 401, message: 'Invalid or expired token' },
+      InvalidTokenException: { status: 401, message: 'Invalid token format' },
+      default: { status: 500, message: 'Authentication error' }
+    };
+
+    const errorConfig = errorResponses[error.name as keyof typeof errorResponses] || errorResponses.default;
+    return res.status(errorConfig.status).json({ message: errorConfig.message });
   }
 }; 

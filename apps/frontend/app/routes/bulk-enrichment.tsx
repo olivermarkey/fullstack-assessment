@@ -4,7 +4,6 @@ import { getAccessTokenFromCookie } from "~/lib/get-cookie";
 import { ApiClient } from "~/lib/api-client";
 import { Form, useNavigation } from "react-router";
 import { useEffect, useRef } from "react";
-import { z } from "zod";
 
 export async function action({ request }: Route.ClientActionArgs) {
   const accessToken = getAccessTokenFromCookie(request);

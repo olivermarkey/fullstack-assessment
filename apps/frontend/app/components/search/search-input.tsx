@@ -1,19 +1,11 @@
-import { TextInput, Text, ActionIcon, Flex } from "@mantine/core";
+import { TextInput, ActionIcon, Flex } from "@mantine/core";
 import { IconSearch, IconX } from '@tabler/icons-react';
 import { useTransition, useState, useEffect } from "react";
 import { useQueryState } from 'nuqs';
 import { searchParsers } from "~/lib/search-params";
 import { useDebounce } from 'use-debounce';
 
-interface SearchInputProps {
-  isSearching: boolean;
-  correctedTerm?: string;
-}
-
-export function SearchInput({
-  isSearching,
-  correctedTerm,
-}: SearchInputProps) {
+export function SearchInput() {
   const [isPending, startTransition] = useTransition();
   const [localSearchTerm, setLocalSearchTerm] = useState('');
   const [searchTerm, setSearchTerm] = useQueryState(
@@ -55,11 +47,6 @@ export function SearchInput({
           style={{ flex: 1 }}
         />
       </Flex>
-      {correctedTerm && (
-        <Text size="sm" c="dimmed">
-          Showing results for: <Text span c="blue">{correctedTerm}</Text>
-        </Text>
-      )}
     </div>
   );
 }
