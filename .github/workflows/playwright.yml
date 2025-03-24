@@ -16,6 +16,21 @@ jobs:
         working-directory: apps/frontend
 
     env:
+      # AWS
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+      AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+
+      # AWS Cognito
+      AWS_COGNITO_USER_POOL_ID: ${{ secrets.AWS_COGNITO_USER_POOL_ID }}
+      AWS_COGNITO_CLIENT_ID: ${{ secrets.AWS_COGNITO_CLIENT_ID }}
+
+      # App
+      APP_URL: ${{ secrets.APP_URL }}
+      API_URL: ${{ secrets.API_URL }}
+      SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+
+      # Test user
       TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
       TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
@@ -47,11 +62,4 @@ jobs:
 
       - name: Run Playwright tests
         run: npx playwright test
-
-      - name: Upload Playwright screenshots
-        if: failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: playwright-screenshots
-          path: apps/frontend/test-results
 
