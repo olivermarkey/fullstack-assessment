@@ -19,6 +19,9 @@ jobs:
         working-directory: apps/frontend
 
     steps:
+      - name: Debug env
+        run: echo "EMAIL=$TEST_USER_EMAIL"
+
       - name: Checkout repo
         uses: actions/checkout@v3
 
