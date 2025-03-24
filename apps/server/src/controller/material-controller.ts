@@ -198,6 +198,7 @@ export class MaterialController extends BaseController {
       ];
 
       // Add attribute columns with generic headers
+      // This will eventually be "attributes" or "taxonomy"
       ballValveAttributes.forEach((attr, index) => {
         const colIndex = index * 2 + 4; // Start after Material Number, Noun, Class columns
         sheet1.getColumn(colIndex).width = 20;

@@ -126,6 +126,7 @@ export default function Login() {
             <Text>Login</Text>
             <FormError fetcher={fetcher} />
             <TextInput
+              id="email"
               withAsterisk
               label="Email"
               placeholder="Email"
@@ -133,6 +134,7 @@ export default function Login() {
               {...form.getInputProps("email")}
             />
             <PasswordInput
+              id="password"
               withAsterisk
               label="Password"
               placeholder="Password"
