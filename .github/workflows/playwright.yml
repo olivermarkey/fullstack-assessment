@@ -53,5 +53,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: playwright-screenshots
-          path: apps/frontend/test-artifacts
+          path: apps/frontend/test-results
 
