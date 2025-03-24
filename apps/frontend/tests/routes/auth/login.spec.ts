@@ -4,6 +4,8 @@ import { test, expect } from "@playwright/test";
 
 test("login with Cognito", async ({ page }) => {
   await page.goto("/login");
+
+  console.log("[TEST] TEST_USER_EMAIL: ", process.env.TEST_USER_EMAIL);
   
   await page.fill("#email", process.env.TEST_USER_EMAIL!);
   await page.fill("#password", process.env.TEST_USER_PASSWORD!);

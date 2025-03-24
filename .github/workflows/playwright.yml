@@ -10,18 +10,16 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
-      TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
     defaults:
       run:
         working-directory: apps/frontend
 
-    steps:
-      - name: Debug env
-        run: echo "EMAIL=$TEST_USER_EMAIL"
+    env:
+      TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+      TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
+    steps:
       - name: Checkout repo
         uses: actions/checkout@v3
 
