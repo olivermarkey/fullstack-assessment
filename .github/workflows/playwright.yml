@@ -47,3 +47,11 @@ jobs:
 
       - name: Run Playwright tests
         run: npx playwright test
+
+      - name: Upload Playwright screenshots
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-screenshots
+          path: apps/frontend/test-artifacts
+
